@@ -1,9 +1,21 @@
 """Configuration management and environment loading.
 
-This module will expose strongly-typed settings objects (pydantic-settings) for the
-application, worker, and CLI contexts. Keeping configuration isolated helps maintain
-12-factor compliance and simplifies testing.
+Includes the runtime settings object for the FastAPI service. These defaults mirror the
+values used by the legacy ingestion tooling so we can run the application locally while
+the rest of the infrastructure is being wired up.
 """
 
-# class Settings(BaseSettings):
-#     """Placeholder for future strongly-typed application configuration."""
+from pydantic_settings import BaseSettings
+
+
+class Settings(BaseSettings):
+    api_title: str = "CypherX API"
+    api_version: str = "0.1.0"
+    storage_dir: str = "./.storage"
+    legacy_base_dir: str = "old_endpoints/backend"
+
+    class Config:
+        env_file = ".env"
+
+
+settings = Settings()

@@ -1,3 +1,19 @@
+import {
+  BookOpen,
+  CreditCard,
+  FileKey2,
+  GaugeCircle,
+  Home,
+  LifeBuoy,
+  PanelsTopLeft,
+  Receipt,
+  ScrollText,
+  Settings2,
+  ShieldCheck,
+  SquareTerminal,
+  Users2,
+  Workflow,
+} from "lucide-react";
 import { type LucideIcon } from "lucide-react";
 
 export type NavItem = {
@@ -54,9 +70,25 @@ export const footerNav: NavSection[] = [
   },
 ];
 
-export const dashboardSidebarNav: SidebarItem[] = [];
+export const dashboardSidebarNav: SidebarItem[] = [
+  { title: "Overview", href: "/dashboard", icon: Home },
+  { title: "Projects", href: "/dashboard/projects", icon: PanelsTopLeft },
+  { title: "API Explorer", href: "/dashboard/explorer", icon: SquareTerminal },
+  { title: "Usage & Health", href: "/dashboard/monitoring", icon: GaugeCircle },
+  { title: "Docs", href: "/docs", icon: BookOpen },
+  { title: "Support", href: "/dashboard/support", icon: LifeBuoy },
+];
 
-export const dashboardSecondaryNav: SidebarItem[] = [];
+export const dashboardSecondaryNav: SidebarItem[] = [
+  { title: "Billing", href: "/dashboard/billing", icon: CreditCard },
+  { title: "Team", href: "/dashboard/team", icon: Users2 },
+  { title: "Security", href: "/dashboard/security", icon: ShieldCheck },
+  { title: "Audit Logs", href: "/dashboard/logs", icon: ScrollText },
+  { title: "Automation", href: "/dashboard/automation", icon: Workflow },
+  { title: "Credentials", href: "/dashboard/credentials", icon: FileKey2 },
+  { title: "Revenue", href: "/dashboard/finance", icon: Receipt },
+  { title: "Workspace Settings", href: "/dashboard/settings", icon: Settings2 },
+];
 
 export const projectNavigation = {
   tabs: [

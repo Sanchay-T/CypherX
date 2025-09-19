@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, JetBrains_Mono } from "next/font/google";
 
 import "./globals.css";
 
@@ -9,13 +9,13 @@ import { Toaster } from "@/components/ui/toaster";
 import { siteConfig } from "@/config/site";
 import { cn } from "@/lib/utils";
 
-const geistSans = Geist({
+const geistSans = Inter({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-geist-sans",
 });
 
-const geistMono = Geist_Mono({
+const geistMono = JetBrains_Mono({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-geist-mono",

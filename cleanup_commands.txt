@@ -1,0 +1,10 @@
+sudo tmutil deletelocalsnapshots /
+sudo tmutil thinlocalsnapshots / 999999999999
+rm -rf ~/Library/Caches/ms-playwright
+rm -rf ~/Library/Caches/pip
+rm -rf ~/Library/Caches/Homebrew
+rm -rf ~/Library/Caches/Yarn
+rm -rf ~/Library/Caches/pnpm
+rm -rf ~/Library/Caches/Google
+rm -rf ~/Library/Caches/Comet
+rm -rf ~/Library/Caches/com.todesktop.230313mzl4w4u92.ShipIt
