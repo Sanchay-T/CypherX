@@ -11,6 +11,7 @@ import {
   Webhook,
 } from "lucide-react";
 
+import { DashboardAwareButton } from "@/components/auth/dashboard-button";
 import { BentoCard } from "@/components/ui/bento-card";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -92,9 +93,12 @@ export default function LandingPage() {
               CypherX exposes the same engine our lenders rely on: one upload, automated validation, enriched ledgers, affordability metrics, and explainable risk signals. Plug it into lending workflows, financial dashboards, or credit scoring in hours—not months.
             </p>
             <div className="flex flex-wrap gap-3">
-              <Button size="lg" asChild>
-                <Link href="/signup">Request sandbox access</Link>
-              </Button>
+              <DashboardAwareButton
+                size="lg"
+                signedOutHref="/signup"
+                signedOutLabel="Request sandbox access"
+                signedInLabel="Go to dashboard"
+              />
               <Button variant="outline" size="lg" asChild>
                 <Link href="/docs" className="gap-2">
                   Explore documentation
@@ -217,9 +221,12 @@ export default function LandingPage() {
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
-            <Button size="lg" asChild>
-              <Link href="/signup">Request sandbox</Link>
-            </Button>
+            <DashboardAwareButton
+              size="lg"
+              signedOutHref="/signup"
+              signedOutLabel="Request sandbox"
+              signedInLabel="Go to dashboard"
+            />
             <Button size="lg" variant="outline" asChild>
               <Link href="/pricing">See pricing</Link>
             </Button>

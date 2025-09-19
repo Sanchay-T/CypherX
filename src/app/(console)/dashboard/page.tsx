@@ -19,7 +19,7 @@ export default function DashboardOverviewPage() {
         description="Monitor usage, manage credentials, and stay ahead of customer needs."
         actions={
           <Button asChild className="gap-2">
-            <Link href="/dashboard/projects/new">Create project</Link>
+            <Link href="/dashboard/projects">Create project</Link>
           </Button>
         }
       />

@@ -1,11 +1,15 @@
 "use client";
 
+import { useEffect, useMemo } from "react";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Loader2 } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { AuthCard, AuthDivider } from "@/components/auth/auth-card";
+import { useAuth } from "@/components/providers/auth-provider";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -23,6 +27,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
 
 const signupSchema = z.object({
   email: z.string().email(),
@@ -34,6 +39,15 @@ const signupSchema = z.object({
 type SignupValues = z.infer<typeof signupSchema>;
 
 export default function SignupPage() {
+  const { user, loading, signup } = useAuth();
+  const { toast } = useToast();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = useMemo(
+    () => searchParams?.get("next") ?? "/dashboard",
+    [searchParams],
+  );
+
   const form = useForm<SignupValues>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
@@ -44,9 +58,34 @@ export default function SignupPage() {
     },
   });
 
-  function onSubmit(values: SignupValues) {
-    console.info("Create account", values);
+  const isSubmitting = form.formState.isSubmitting;
+
+  useEffect(() => {
+    if (!loading && user) {
+      router.replace(redirectTo);
+    }
+  }, [loading, user, router, redirectTo]);
+
+  async function onSubmit(values: SignupValues) {
+    form.clearErrors("root");
+    try {
+      await signup({
+        email: values.email,
+        password: values.password,
+        full_name: values.name,
+        team_size: values.teamSize,
+      });
+      toast({ title: "Account created", description: "Your workspace is ready." });
+      router.replace(redirectTo);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Unable to create account. Try again.";
+      form.setError("root", { message });
+      toast({ variant: "destructive", title: "Signup failed", description: message });
+    }
   }
+
+  const rootError = form.formState.errors.root?.message;
 
   return (
     <AuthCard
@@ -73,7 +112,7 @@ export default function SignupPage() {
               <FormItem>
                 <FormLabel>Full name</FormLabel>
                 <FormControl>
-                  <Input placeholder="Sanchay Patel" {...field} />
+                  <Input placeholder="Sanchay Patel" disabled={isSubmitting} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -86,7 +125,12 @@ export default function SignupPage() {
               <FormItem>
                 <FormLabel>Work email</FormLabel>
                 <FormControl>
-                  <Input placeholder="you@company.com" type="email" {...field} />
+                  <Input
+                    placeholder="you@company.com"
+                    type="email"
+                    disabled={isSubmitting}
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -98,9 +142,9 @@ export default function SignupPage() {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Team size</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <Select onValueChange={field.onChange} value={field.value} disabled={isSubmitting}>
                   <FormControl>
-                    <SelectTrigger>
+                    <SelectTrigger disabled={isSubmitting}>
                       <SelectValue placeholder="Select team size" />
                     </SelectTrigger>
                   </FormControl>
@@ -125,6 +169,7 @@ export default function SignupPage() {
                   <Input
                     type="password"
                     placeholder="Create a strong password"
+                    disabled={isSubmitting}
                     {...field}
                   />
                 </FormControl>
@@ -132,8 +177,18 @@ export default function SignupPage() {
               </FormItem>
             )}
           />
-          <Button type="submit" className="w-full">
-            Create account
+          {rootError ? (
+            <p className="text-sm text-destructive">{rootError}</p>
+          ) : null}
+          <Button type="submit" className="w-full" disabled={isSubmitting}>
+            {isSubmitting ? (
+              <span className="flex items-center justify-center gap-2">
+                <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+                Creating account…
+              </span>
+            ) : (
+              "Create account"
+            )}
           </Button>
         </form>
       </Form>

@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { DashboardAwareButton } from "@/components/auth/dashboard-button";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -65,15 +66,23 @@ export default function PricingPage() {
               </ul>
             </CardContent>
             <CardFooter>
-              <Button
-                asChild
-                className="w-full"
-                variant={plan.highlight ? "default" : "outline"}
-              >
-                <Link href={plan.price === "Custom" ? "/contact" : "/signup"}>
-                  {plan.cta}
-                </Link>
-              </Button>
+              {plan.price === "Custom" ? (
+                <Button
+                  asChild
+                  className="w-full"
+                  variant={plan.highlight ? "default" : "outline"}
+                >
+                  <Link href="/contact">{plan.cta}</Link>
+                </Button>
+              ) : (
+                <DashboardAwareButton
+                  className="w-full"
+                  variant={plan.highlight ? "default" : "outline"}
+                  signedOutHref="/signup"
+                  signedOutLabel={plan.cta}
+                  signedInLabel="Go to dashboard"
+                />
+              )}
             </CardFooter>
           </Card>
         ))}

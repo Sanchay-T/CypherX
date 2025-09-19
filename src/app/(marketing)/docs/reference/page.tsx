@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { LanguageSelect } from "@/components/docs/language-select";
 import { DocsLanguageProvider } from "@/components/docs/docs-language-context";
+import { EndpointActions } from "@/components/docs/endpoint-actions";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -485,64 +486,68 @@ client.Do(req)`,
 
             {endpoints.map((endpoint) => (
               <section key={endpoint.id} id={endpoint.id} className="scroll-mt-24">
-                <div className="space-y-8 rounded-xl border border-border/50 bg-background/70 p-6 shadow-sm md:p-8 2xl:p-10">
-                  <div className="space-y-2">
-                    <div className="flex flex-wrap items-center gap-3">
-                      <Badge variant="outline" className="border-primary/40 text-primary">
-                        {endpoint.method}
-                      </Badge>
-                      <h2 className="text-2xl font-semibold text-foreground">{endpoint.path}</h2>
+                <div className="space-y-6 rounded-xl border border-border/50 bg-background/70 p-6 shadow-sm md:p-8 2xl:p-10">
+                  <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+                    <div className="space-y-2">
+                      <div className="flex flex-wrap items-center gap-3">
+                        <Badge variant="outline" className="border-primary/40 text-primary">
+                          {endpoint.method}
+                        </Badge>
+                        <h2 className="text-2xl font-semibold text-foreground">{endpoint.path}</h2>
+                      </div>
+                      <p className="text-sm text-muted-foreground">{endpoint.summary}</p>
                     </div>
-                    <p className="text-sm text-muted-foreground">{endpoint.summary}</p>
+                    <EndpointActions path={endpoint.path} />
                   </div>
-                  <div className="grid gap-6 lg:grid-cols-12">
-                    <Card className="col-span-full border-border/70 lg:col-span-3 xl:col-span-3 2xl:col-span-2">
+
+                  <div className="flex flex-col gap-6 xl:flex-row">
+                    <Card className="border-border/70 xl:w-72">
                       <CardHeader>
                         <CardTitle className="text-base font-semibold">Quick specs</CardTitle>
                       </CardHeader>
-                      <CardContent className="space-y-3 text-sm text-muted-foreground">
+                      <CardContent className="flex flex-wrap gap-2 text-xs text-muted-foreground">
                         {endpoint.quickSpecs.map((spec) => (
                           <div
                             key={spec.label}
-                            className="grid grid-cols-[auto_1fr] items-center gap-x-3 rounded-lg border border-border/60 bg-muted/20 px-3 py-2 text-xs"
+                            className="flex min-w-[140px] flex-1 items-center justify-between gap-3 rounded-lg border border-border/60 bg-muted/20 px-3 py-2"
                           >
                             <span className="font-medium text-foreground">{spec.label}</span>
-                            <span className="justify-self-end text-right text-muted-foreground">{spec.value}</span>
+                            <span className="text-muted-foreground">{spec.value}</span>
                           </div>
                         ))}
                       </CardContent>
                     </Card>
 
-                    <div className="col-span-full grid gap-6 lg:col-span-6 xl:col-span-7 2xl:col-span-8 xl:grid-cols-5">
-                      <div className="col-span-full xl:col-span-3">
-                        <CodeSnippetTabs snippets={endpoint.snippets} className="h-full shadow-sm" />
-                      </div>
-                      <Card className="col-span-full border-border/70 xl:col-span-2">
-                        <CardHeader>
-                          <CardTitle className="text-base font-semibold">Sample response</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <pre className="rounded-lg border border-border/60 bg-background/95 p-4 text-xs text-muted-foreground whitespace-pre-wrap overflow-auto">
-                            {endpoint.response}
-                          </pre>
-                        </CardContent>
-                      </Card>
-                    </div>
+                    <div className="flex-1 space-y-6">
+                      <CodeSnippetTabs snippets={endpoint.snippets} className="shadow-sm" />
+                      <div className="grid gap-6 lg:grid-cols-2">
+                        <Card className="border-border/70">
+                          <CardHeader>
+                            <CardTitle className="text-base font-semibold">Sample response</CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <pre className="rounded-lg border border-border/60 bg-background/95 p-4 text-xs text-muted-foreground whitespace-pre-wrap overflow-auto">
+                              {endpoint.response}
+                            </pre>
+                          </CardContent>
+                        </Card>
 
-                    <Card className="col-span-full border-border/70 lg:col-span-3 xl:col-span-2 2xl:col-span-2">
-                      <CardHeader>
-                        <CardTitle className="text-base font-semibold">Integration tips</CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-2 text-xs text-muted-foreground">
-                        <ul className="space-y-2">
-                          {endpoint.tips.map((tip) => (
-                            <li key={tip} className="leading-relaxed">
-                              {tip}
-                            </li>
-                          ))}
-                        </ul>
-                      </CardContent>
-                    </Card>
+                        <Card className="border-border/70">
+                          <CardHeader>
+                            <CardTitle className="text-base font-semibold">Integration tips</CardTitle>
+                          </CardHeader>
+                          <CardContent className="space-y-2 text-xs text-muted-foreground">
+                            <ul className="space-y-2">
+                              {endpoint.tips.map((tip) => (
+                                <li key={tip} className="leading-relaxed">
+                                  {tip}
+                                </li>
+                              ))}
+                            </ul>
+                          </CardContent>
+                        </Card>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </section>

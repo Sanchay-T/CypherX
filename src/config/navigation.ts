@@ -85,6 +85,7 @@ export const dashboardSecondaryNav: SidebarItem[] = [
   { title: "Security", href: "/dashboard/security", icon: ShieldCheck },
   { title: "Audit Logs", href: "/dashboard/logs", icon: ScrollText },
   { title: "Automation", href: "/dashboard/automation", icon: Workflow },
+  { title: "Docs & Guides", href: "/docs/reference", icon: BookOpen },
   { title: "Credentials", href: "/dashboard/credentials", icon: FileKey2 },
   { title: "Revenue", href: "/dashboard/finance", icon: Receipt },
   { title: "Workspace Settings", href: "/dashboard/settings", icon: Settings2 },
