@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   ArrowRight,
   Bell,
@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 
 import { Logo } from "@/components/branding/logo";
+import { useAuth } from "@/components/providers/auth-provider";
 import { HelpDrawer } from "@/components/system/help-drawer";
 import { ThemeToggle } from "@/components/system/theme-toggle";
 import { Button } from "@/components/ui/button";
@@ -160,21 +161,39 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
 }
 
 function UserMenu() {
+  const { user, logout } = useAuth();
+  const router = useRouter();
+
+  const displayName = user?.fullName?.trim() || user?.email || "CypherX user";
+  const subtitle = useMemo(() => {
+    if (user?.teamSize) {
+      return `Team size · ${user.teamSize}`;
+    }
+    return user?.email ?? "";
+  }, [user?.teamSize, user?.email]);
+
+  const handleSignOut = () => {
+    logout();
+    router.replace("/login");
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" className="flex h-9 items-center gap-2 rounded-full border-border/80">
-          <UserAvatar initials="SP" className="h-7 w-7" />
+          <UserAvatar name={displayName} className="h-7 w-7" />
           <div className="hidden flex-col text-left text-xs leading-tight sm:flex">
-            <span className="font-medium text-foreground">Sanchay Patel</span>
-            <span className="text-muted-foreground">Founder · CypherX Labs</span>
+            <span className="font-medium text-foreground">{displayName}</span>
+            {subtitle ? <span className="text-muted-foreground">{subtitle}</span> : null}
           </div>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-64">
         <DropdownMenuLabel className="flex flex-col items-start">
-          <p className="text-sm font-semibold">Sanchay Patel</p>
-          <p className="text-xs text-muted-foreground">sanchay@cypherx.dev</p>
+          <p className="text-sm font-semibold">{displayName}</p>
+          {user?.email ? (
+            <p className="text-xs text-muted-foreground">{user.email}</p>
+          ) : null}
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
@@ -188,8 +207,13 @@ function UserMenu() {
           ))}
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <Link href="/logout">Sign out</Link>
+        <DropdownMenuItem
+          onSelect={(event) => {
+            event.preventDefault();
+            handleSignOut();
+          }}
+        >
+          Sign out
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

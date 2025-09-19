@@ -1,11 +1,15 @@
 "use client";
 
+import { useEffect, useMemo } from "react";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Loader2 } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { AuthCard, AuthDivider, AuthFooterLink } from "@/components/auth/auth-card";
+import { useAuth } from "@/components/providers/auth-provider";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -17,6 +21,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
+import { useToast } from "@/hooks/use-toast";
 
 const loginSchema = z.object({
   email: z.string().email("Enter a valid email"),
@@ -26,6 +31,15 @@ const loginSchema = z.object({
 type LoginValues = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
+  const { user, loading, login } = useAuth();
+  const { toast } = useToast();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = useMemo(
+    () => searchParams?.get("next") ?? "/dashboard",
+    [searchParams],
+  );
+
   const form = useForm<LoginValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -34,9 +48,29 @@ export default function LoginPage() {
     },
   });
 
-  function onSubmit(values: LoginValues) {
-    console.info("Sign in", values);
+  const isSubmitting = form.formState.isSubmitting;
+
+  useEffect(() => {
+    if (!loading && user) {
+      router.replace(redirectTo);
+    }
+  }, [loading, user, router, redirectTo]);
+
+  async function onSubmit(values: LoginValues) {
+    form.clearErrors("root");
+    try {
+      await login({ email: values.email, password: values.password });
+      toast({ title: "Signed in", description: "Welcome back to CypherX." });
+      router.replace(redirectTo);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Unable to sign in. Please try again.";
+      form.setError("root", { message });
+      toast({ variant: "destructive", title: "Sign in failed", description: message });
+    }
   }
+
+  const rootError = form.formState.errors.root?.message;
 
   return (
     <AuthCard
@@ -58,7 +92,12 @@ export default function LoginPage() {
               <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input placeholder="you@company.com" type="email" {...field} />
+                  <Input
+                    placeholder="you@company.com"
+                    type="email"
+                    disabled={isSubmitting}
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -71,14 +110,29 @@ export default function LoginPage() {
               <FormItem>
                 <FormLabel>Password</FormLabel>
                 <FormControl>
-                  <Input placeholder="••••••••" type="password" {...field} />
+                  <Input
+                    placeholder="••••••••"
+                    type="password"
+                    disabled={isSubmitting}
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-          <Button type="submit" className="w-full">
-            Sign in
+          {rootError ? (
+            <p className="text-sm text-destructive">{rootError}</p>
+          ) : null}
+          <Button type="submit" className="w-full" disabled={isSubmitting}>
+            {isSubmitting ? (
+              <span className="flex items-center justify-center gap-2">
+                <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+                Signing in…
+              </span>
+            ) : (
+              "Sign in"
+            )}
           </Button>
         </form>
       </Form>

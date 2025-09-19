@@ -3,6 +3,7 @@ import { Inter, JetBrains_Mono } from "next/font/google";
 
 import "./globals.css";
 
+import { AuthProvider } from "@/components/providers/auth-provider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { CommandMenu } from "@/components/system/command-menu";
 import { Toaster } from "@/components/ui/toaster";
@@ -83,9 +84,11 @@ export default function RootLayout({
         )}
       >
         <ThemeProvider>
-          {children}
-          <CommandMenu />
-          <Toaster />
+          <AuthProvider>
+            {children}
+            <CommandMenu />
+            <Toaster />
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

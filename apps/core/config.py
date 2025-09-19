@@ -47,6 +47,23 @@ class Settings(BaseSettings):
     supabase_jwt_secret: str | None = Field(default=None, alias="SUPABASE_JWT_SECRET")
     legacy_jwt_secret: str | None = Field(default=None, alias="LEGACY_JWT_KEY")
 
+    claude_vertex_project_id: str | None = Field(
+        default=None, alias="CLAUDE_VERTEX_PROJECT_ID"
+    )
+    claude_vertex_location: str = Field(
+        default="global", alias="CLAUDE_VERTEX_LOCATION"
+    )
+    claude_vertex_model: str = Field(
+        default="claude-sonnet-4@20250514", alias="CLAUDE_VERTEX_MODEL"
+    )
+
+    gemini_project_id: str | None = Field(default=None, alias="GEMINI_PROJECT_ID")
+    gemini_location: str = Field(default="us-east5", alias="GEMINI_LOCATION")
+    gemini_model: str = Field(default="gemini-1.5-pro-002", alias="GEMINI_MODEL")
+    gemini_embedding_model: str = Field(
+        default="gemini-embedding-001", alias="GEMINI_EMBEDDING_MODEL"
+    )
+
     def model_post_init(self, __context: object) -> None:  # pragma: no cover - simple wiring
         if not self.supabase_service_role and self.supabase_service_role_legacy:
             object.__setattr__(
@@ -99,6 +116,55 @@ class Settings(BaseSettings):
             return self.database_url
         raise RuntimeError(
             "Database DSN not configured. Provide SUPABASE_SESSION_POOLER, SUPABASE_DIRECT_URL, or DATABASE_URL."
+        )
+
+    def _vertex_host(self, location: str) -> str:
+        return (
+            "https://aiplatform.googleapis.com"
+            if location == "global"
+            else f"https://{location}-aiplatform.googleapis.com"
+        )
+
+    @property
+    def claude_vertex_model_path(self) -> str:
+        if not self.claude_vertex_project_id:
+            raise RuntimeError(
+                "Claude Vertex project is not configured. Set CLAUDE_VERTEX_PROJECT_ID."
+            )
+
+        location = self.claude_vertex_location
+        base_host = self._vertex_host(location)
+
+        return (
+            f"{base_host}/v1/projects/{self.claude_vertex_project_id}/locations/{location}/"
+            f"publishers/anthropic/models/{self.claude_vertex_model}"
+        )
+
+    @property
+    def gemini_project(self) -> str:
+        project = self.gemini_project_id or self.claude_vertex_project_id
+        if not project:
+            raise RuntimeError(
+                "Gemini project is not configured. Set GEMINI_PROJECT_ID or CLAUDE_VERTEX_PROJECT_ID."
+            )
+        return project
+
+    @property
+    def gemini_model_path(self) -> str:
+        location = self.gemini_location
+        base_host = self._vertex_host(location)
+        return (
+            f"{base_host}/v1/projects/{self.gemini_project}/locations/{location}/"
+            f"publishers/google/models/{self.gemini_model}"
+        )
+
+    @property
+    def gemini_embedding_model_path(self) -> str:
+        location = self.gemini_location
+        base_host = self._vertex_host(location)
+        return (
+            f"{base_host}/v1/projects/{self.gemini_project}/locations/{location}/"
+            f"publishers/google/models/{self.gemini_embedding_model}"
         )
 
 
