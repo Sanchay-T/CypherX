@@ -64,6 +64,10 @@ class Settings(BaseSettings):
         default="gemini-embedding-001", alias="GEMINI_EMBEDDING_MODEL"
     )
 
+    mistral_project_id: str | None = Field(default=None, alias="MISTRAL_PROJECT_ID")
+    mistral_location: str = Field(default="us-central1", alias="MISTRAL_LOCATION")
+    mistral_model: str = Field(default="mistral-ocr-2505", alias="MISTRAL_MODEL")
+
     def model_post_init(self, __context: object) -> None:  # pragma: no cover - simple wiring
         if not self.supabase_service_role and self.supabase_service_role_legacy:
             object.__setattr__(
@@ -165,6 +169,24 @@ class Settings(BaseSettings):
         return (
             f"{base_host}/v1/projects/{self.gemini_project}/locations/{location}/"
             f"publishers/google/models/{self.gemini_embedding_model}"
+        )
+
+    @property
+    def mistral_project(self) -> str:
+        project = self.mistral_project_id or self.claude_vertex_project_id
+        if not project:
+            raise RuntimeError(
+                "Mistral project is not configured. Set MISTRAL_PROJECT_ID or CLAUDE_VERTEX_PROJECT_ID."
+            )
+        return project
+
+    @property
+    def mistral_model_path(self) -> str:
+        location = self.mistral_location
+        base_host = self._vertex_host(location)
+        return (
+            f"{base_host}/v1/projects/{self.mistral_project}/locations/{location}/"
+            f"publishers/mistralai/models/{self.mistral_model}"
         )
 
 
