@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ headline }}</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 2.5cm 2cm;
+    }
+    body {
+      font-family: "Helvetica Neue", Arial, sans-serif;
+      color: #1a1c1f;
+      margin: 0;
+      padding: 0;
+      font-size: 12px;
+      line-height: 1.5;
+      background: #f8f9fb;
+    }
+    header {
+      margin-bottom: 24px;
+    }
+    .brand {
+      font-size: 20px;
+      letter-spacing: 1px;
+      font-weight: 700;
+      color: #111827;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #eef2ff;
+      color: #3730a3;
+      font-weight: 600;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 10px;
+    }
+    h1 {
+      font-size: 26px;
+      margin: 8px 0 12px;
+      color: #111827;
+    }
+    .meta {
+      font-size: 11px;
+      color: #6b7280;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 18px 20px;
+      margin-bottom: 18px;
+      box-shadow: 0 12px 24px rgba(15, 23, 42, 0.06);
+    }
+    .card h2 {
+      font-size: 16px;
+      margin: 0 0 6px;
+      color: #1e293b;
+    }
+    .card h3 {
+      font-size: 14px;
+      margin: 14px 0 6px;
+      color: #0f172a;
+    }
+    ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+    ul li {
+      margin-bottom: 4px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      font-size: 11px;
+    }
+    table thead {
+      background: #f1f5f9;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      font-weight: 600;
+    }
+    table th, table td {
+      padding: 8px 10px;
+      border: 1px solid #e2e8f0;
+      text-align: left;
+    }
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .metric {
+      background: linear-gradient(135deg, #f8fafc, #eef2ff);
+      border-radius: 12px;
+      padding: 12px;
+    }
+    .metric span {
+      display: block;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #4f46e5;
+      margin-bottom: 6px;
+    }
+    .metric strong {
+      font-size: 16px;
+      color: #1e293b;
+    }
+    .muted {
+      color: #6b7280;
+    }
+    .footnote {
+      margin-top: 24px;
+      font-size: 10px;
+      color: #94a3b8;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="badge">CypherX Statement Insights</div>
+    <div class="brand">CypherX Labs</div>
+    <h1>{{ headline }}</h1>
+    <div class="meta">
+      <div><strong>Prepared for:</strong> {{ prepared_for }}</div>
+      <div><strong>Period:</strong> {{ period }}</div>
+      <div><strong>Generated on:</strong> {{ generated_at }}</div>
+    </div>
+  </header>
+
+  <section class="card">
+    <h2>Executive Summary</h2>
+    <p>{{ executive_summary }}</p>
+    <div class="metric-grid">
+      {% for metric in key_metrics %}
+      <div class="metric">
+        <span>{{ metric.label }}</span>
+        {% if metric.format == 'inr' %}
+          <strong>{{ metric.value|inr }}</strong>
+        {% else %}
+          <strong>{{ metric.value }}</strong>
+        {% endif %}
+        {% if metric.note %}<div class="muted" style="margin-top:4px;">{{ metric.note }}</div>{% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  {% for section in sections %}
+  <section class="card">
+    <h2>{{ section.heading }}</h2>
+    <p>{{ section.summary }}</p>
+    {% if section.bullet_points %}
+    <h3>Highlights</h3>
+    <ul>
+      {% for bullet in section.bullet_points %}
+      <li>{{ bullet }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+
+    {% if section.highlight_transactions %}
+    <h3>Key transactions</h3>
+    <ul>
+      {% for tx in section.highlight_transactions %}
+      <li>{{ tx }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+  </section>
+  {% endfor %}
+
+  {% if charts %}
+  <section class="card">
+    <h2>Suggested Visualisations</h2>
+    <ul>
+      {% for chart in charts %}
+      <li><strong>{{ chart.title }}</strong> — {{ chart.description }} ({{ chart.chart_type }})</li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+
+  {% if transaction_sample %}
+  <section class="card">
+    <h2>Sample Transactions</h2>
+    <table>
+      <thead>
+        <tr>
+          {% for header in transaction_sample.headers %}
+          <th>{{ header }}</th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in transaction_sample.rows %}
+        <tr>
+          {% for cell in row %}
+          <td>{{ cell }}</td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+  {% endif %}
+
+  <p class="footnote">Confidential. Generated by CypherX AI pipeline.</p>
+</body>
+</html>

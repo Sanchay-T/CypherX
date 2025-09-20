@@ -2,7 +2,7 @@
 
 import type { DragEvent } from "react"
 import { useCallback, useMemo, useRef, useState } from "react"
-import { FileText, Loader2, Upload } from "lucide-react"
+import { Loader2, Sparkles, Timer, Upload } from "lucide-react"
 
 import { runMistralOcr } from "@/lib/ocr-client"
 import { cn } from "@/lib/utils"
@@ -12,13 +12,17 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import {
+  SAMPLE_DRAG_TYPE,
+  SAMPLE_STATEMENTS,
+  type SampleStatementMeta,
+  SampleStatementCard,
+} from "@/components/docs/sample-statement-card"
 
-const SAMPLE_URL = "/samples/axis.pdf"
-const SAMPLE_DRAG_TYPE = "application/x-cypherx-sample"
-
-function formatCurrency(value: number, currency = "USD"): string {
-  return new Intl.NumberFormat("en-US", {
+function formatCurrency(value: number, currency = "INR"): string {
+  return new Intl.NumberFormat("en-IN", {
     style: "currency",
     currency,
     maximumFractionDigits: 6,
@@ -44,14 +48,24 @@ export function MistralOcrPlayground(): JSX.Element {
   const [result, setResult] = useState<MistralOcrResponse | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isDragging, setIsDragging] = useState(false)
+  const [latencyMs, setLatencyMs] = useState<number | null>(null)
+  const [selectedSampleId, setSelectedSampleId] = useState<string>(SAMPLE_STATEMENTS[0]?.id ?? "")
+
+  const selectedSample = useMemo(
+    () => SAMPLE_STATEMENTS.find((sample) => sample.id === selectedSampleId) ?? SAMPLE_STATEMENTS[0],
+    [selectedSampleId],
+  )
 
   const analyzeFile = useCallback(async (file: File) => {
     setError(null)
     setUploadState({ fileName: file.name, status: "uploading" })
+    setLatencyMs(null)
     try {
+      const started = performance.now()
       const response = await runMistralOcr(file)
       setResult(response)
       setUploadState({ fileName: file.name, status: "success" })
+      setLatencyMs(performance.now() - started)
     } catch (err) {
       setResult(null)
       setUploadState({ fileName: file.name, status: "error" })
@@ -73,23 +87,30 @@ export function MistralOcrPlayground(): JSX.Element {
     [analyzeFile],
   )
 
-  const handleSample = useCallback(async () => {
-    setError(null)
-    setUploadState({ fileName: "axis.pdf", status: "uploading" })
-    try {
-      const response = await fetch(SAMPLE_URL)
-      if (!response.ok) {
-        throw new Error("Unable to load sample PDF.")
+  const handleSample = useCallback(
+    async (sample: SampleStatementMeta) => {
+      setError(null)
+      setUploadState({ fileName: sample.url.split("/").pop() ?? sample.id, status: "uploading" })
+      setSelectedSampleId(sample.id)
+      setLatencyMs(null)
+      try {
+        const response = await fetch(sample.url)
+        if (!response.ok) {
+          throw new Error("Unable to load sample PDF.")
+        }
+        const blob = await response.blob()
+        const sampleFile = new File([blob], sample.url.split("/").pop() ?? `${sample.id}.pdf`, {
+          type: "application/pdf",
+        })
+        await analyzeFile(sampleFile)
+      } catch (err) {
+        setUploadState({ fileName: sample.url.split("/").pop() ?? sample.id, status: "error" })
+        const message = err instanceof Error ? err.message : "Unexpected error"
+        setError(message)
       }
-      const blob = await response.blob()
-      const sampleFile = new File([blob], "axis.pdf", { type: "application/pdf" })
-      await analyzeFile(sampleFile)
-    } catch (err) {
-      setUploadState({ fileName: "axis.pdf", status: "error" })
-      const message = err instanceof Error ? err.message : "Unexpected error"
-      setError(message)
-    }
-  }, [analyzeFile])
+    },
+    [analyzeFile],
+  )
 
   const onDrop = useCallback(
     async (event: DragEvent<HTMLDivElement>) => {
@@ -102,9 +123,15 @@ export function MistralOcrPlayground(): JSX.Element {
         return
       }
 
-      if (dataTransfer?.types.includes(SAMPLE_DRAG_TYPE)) {
-        await handleSample()
-        return
+      if (dataTransfer) {
+        const sampleUrl = dataTransfer.getData(SAMPLE_DRAG_TYPE)
+        if (sampleUrl) {
+          const sample = SAMPLE_STATEMENTS.find((item) => item.url === sampleUrl)
+          if (sample) {
+            await handleSample(sample)
+          }
+          return
+        }
       }
     },
     [handleFiles, handleSample],
@@ -113,6 +140,11 @@ export function MistralOcrPlayground(): JSX.Element {
   const handleBrowse = () => {
     inputRef.current?.click()
   }
+
+  const handleSampleCardDrag = useCallback((sample: SampleStatementMeta, event: DragEvent<HTMLDivElement>) => {
+    event.dataTransfer.setData(SAMPLE_DRAG_TYPE, sample.url)
+    event.dataTransfer.effectAllowed = "copy"
+  }, [])
 
   const renderPageTabs = (pages: MistralOcrPage[]) => {
     if (!pages.length) return null
@@ -162,6 +194,8 @@ export function MistralOcrPlayground(): JSX.Element {
     )
   }
 
+  const manualLatencySeconds = latencyMs ? (latencyMs / 1000).toFixed(2) : null
+
   return (
     <div className="space-y-8">
       <Card className="border-border/70">
@@ -198,16 +232,27 @@ export function MistralOcrPlayground(): JSX.Element {
               <p className="text-sm text-muted-foreground">
                 Supports multi-page statements up to 15 MB. We keep files in-memory only for parsing.
               </p>
+              {isDragging ? (
+                <div className="rounded-full border border-primary/50 bg-primary/10 px-4 py-1 text-xs font-medium text-primary">
+                  Release to process
+                </div>
+              ) : null}
             </div>
             <div className="flex flex-col items-center gap-3 sm:flex-row">
               <Button onClick={handleBrowse} variant="outline">
                 Browse files
               </Button>
+              <Button
+                onClick={() => selectedSample && handleSample(selectedSample)}
+                variant="ghost"
+                className="gap-2"
+              >
+                <Sparkles className="size-4" /> Use sample statement
+              </Button>
             </div>
             {uploadState.status === "uploading" && (
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Loader2 className="size-4 animate-spin" />
-                Processing {uploadState.fileName ?? "document"}…
+                <Loader2 className="size-4 animate-spin" /> Launching pipeline…
               </div>
             )}
             {uploadState.status === "success" && uploadState.fileName && (
@@ -224,13 +269,35 @@ export function MistralOcrPlayground(): JSX.Element {
             />
           </div>
 
-          <SampleStatementCard
-            onClick={handleSample}
-            onDragStart={(event) => {
-              event.dataTransfer.setData(SAMPLE_DRAG_TYPE, "axis.pdf")
-              event.dataTransfer.effectAllowed = "copy"
-            }}
-          />
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <div className="text-sm font-medium text-foreground">Sample statements</div>
+              <Select value={selectedSampleId} onValueChange={setSelectedSampleId}>
+                <SelectTrigger className="w-full sm:w-[260px]">
+                  <SelectValue placeholder="Select sample" />
+                </SelectTrigger>
+                <SelectContent>
+                  {SAMPLE_STATEMENTS.map((sample) => (
+                    <SelectItem key={sample.id} value={sample.id}>
+                      {sample.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+              {SAMPLE_STATEMENTS.map((sample) => (
+                <SampleStatementCard
+                  key={sample.id}
+                  sample={sample}
+                  onClick={handleSample}
+                  onDragStart={handleSampleCardDrag}
+                  active={sample.id === selectedSampleId}
+                />
+              ))}
+            </div>
+          </div>
 
           {error && (
             <Alert variant="destructive">
@@ -265,6 +332,14 @@ export function MistralOcrPlayground(): JSX.Element {
                       <span>Base64 payload</span>
                       <span className="font-medium text-foreground">{result.usage.base64_size.toLocaleString()} chars</span>
                     </div>
+                    {manualLatencySeconds ? (
+                      <div className="flex items-center justify-between text-primary">
+                        <span className="flex items-center gap-2">
+                          <Timer className="size-4" /> Elapsed time
+                        </span>
+                        <span className="font-semibold text-primary">{manualLatencySeconds} s</span>
+                      </div>
+                    ) : null}
                   </CardContent>
                 </Card>
 
@@ -278,19 +353,19 @@ export function MistralOcrPlayground(): JSX.Element {
                         <div className="flex items-center justify-between">
                           <span>Page-based</span>
                           <span className="font-medium text-foreground">
-                            {formatCurrency(result.cost.page_cost, result.cost.currency)}
+                            {formatCurrency(result.cost.page_cost)}
                           </span>
                         </div>
                         <div className="flex items-center justify-between">
                           <span>Size-based</span>
                           <span className="font-medium text-foreground">
-                            {formatCurrency(result.cost.size_cost, result.cost.currency)}
+                            {formatCurrency(result.cost.size_cost)}
                           </span>
                         </div>
                         <div className="flex items-center justify-between">
                           <span>Total (greater of both)</span>
                           <span className="font-semibold text-foreground">
-                            {formatCurrency(result.cost.estimated_total_cost, result.cost.currency)}
+                            {formatCurrency(result.cost.estimated_total_cost)}
                           </span>
                         </div>
                       </>
@@ -402,7 +477,8 @@ function extractTables(markdown: string): ParsedTable[] {
   for (const rawLine of lines) {
     const line = rawLine.trim()
     if (line.startsWith("|") && line.endsWith("|") && line.includes("|")) {
-      const cells = line
+      const sanitizedLine = line.replace(/<br\s*\/?\>/gi, " ")
+      const cells = sanitizedLine
         .split("|")
         .slice(1, -1)
         .map((cell) => cell.trim())
@@ -425,59 +501,36 @@ function extractTables(markdown: string): ParsedTable[] {
 
 function normalizeTable(table: string[][]): ParsedTable | null {
   if (table.length < 2) return null
-  const headers = table[0]
+
+  const maxColumns = Math.max(...table.map((row) => row.length))
+  const normalized = table.map((row) => {
+    if (row.length === maxColumns) {
+      return row
+    }
+    return [...row, ...Array(maxColumns - row.length).fill("")]
+  })
+
+  const headers = normalized[0].map((cell) => cell.trim())
   let dataStart = 1
 
-  if (table[1].every((cell) => /^:?-{2,}:?$/.test(cell))) {
+  if (normalized[1].every((cell) => /^:?-{2,}:?$/.test(cell))) {
     dataStart = 2
   }
 
-  const rows = table.slice(dataStart)
-  const normalizedRows = rows.map((row) => {
-    if (row.length === headers.length) return row
-    if (row.length < headers.length) {
-      return [...row, ...Array(headers.length - row.length).fill("")]
-    }
-    return row.slice(0, headers.length)
+  const rows = normalized.slice(dataStart).map((row) => row.map((cell) => cell.trim()))
+
+  const keepColumn = headers.map((header, idx) => {
+    const columnEmpty = rows.every((row) => !row[idx] || row[idx] === "-")
+    return !(header === "" && columnEmpty)
   })
+
+  const filteredHeaders = headers.filter((_, idx) => keepColumn[idx])
+  const filteredRows = rows.map((row) => row.filter((_, idx) => keepColumn[idx]))
+
+  if (!filteredHeaders.length) return null
+
   return {
-    headers,
-    rows: normalizedRows,
+    headers: filteredHeaders,
+    rows: filteredRows,
   }
-}
-
-interface SampleStatementCardProps {
-  onClick: () => void
-  onDragStart: (event: DragEvent<HTMLDivElement>) => void
-}
-
-function SampleStatementCard({ onClick, onDragStart }: SampleStatementCardProps): JSX.Element {
-  return (
-    <div className="grid gap-3 rounded-xl border border-border/60 bg-muted/10 p-4 sm:grid-cols-[auto_1fr] sm:items-center">
-      <div
-        role="button"
-        tabIndex={0}
-        draggable
-        onDragStart={onDragStart}
-        onKeyDown={(event) => {
-          if (event.key === "Enter" || event.key === " ") {
-            event.preventDefault()
-            onClick()
-          }
-        }}
-        onClick={onClick}
-        className="flex h-20 w-20 cursor-grab select-none flex-col items-center justify-center gap-2 rounded-lg border border-border/60 bg-background text-primary shadow-sm transition hover:border-primary hover:bg-primary/5 active:cursor-grabbing"
-      >
-        <FileText className="size-8" />
-        <span className="text-[10px] font-medium uppercase tracking-wide">Sample PDF</span>
-      </div>
-
-      <div className="space-y-2 text-sm text-muted-foreground">
-        <p className="font-medium text-foreground">Try the included Axis Bank statement</p>
-        <p>
-          Drag the sample card into the dropzone above or click to trigger an OCR run. Ideal for quick stakeholder walkthroughs without uploading real customer data.
-        </p>
-      </div>
-    </div>
-  )
 }

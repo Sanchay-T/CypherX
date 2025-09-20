@@ -161,7 +161,7 @@ export const plans = [
   },
   {
     name: "Scale",
-    price: "$399",
+    price: "₹33,000",
     cta: "Upgrade",
     description: "Growth teams shipping APIs to thousands of users with observability and security in place.",
     features: [

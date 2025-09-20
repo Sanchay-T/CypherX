@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { LanguageSelect } from "@/components/docs/language-select";
 import { DocsLanguageProvider } from "@/components/docs/docs-language-context";
+import { LedgerBuilderPlayground } from "@/components/docs/ledger-builder-playground";
 import { MistralOcrPlayground } from "@/components/docs/mistral-ocr-playground";
 import { EndpointActions } from "@/components/docs/endpoint-actions";
 import { Badge } from "@/components/ui/badge";
@@ -26,6 +27,7 @@ const navSections = [
     label: "Overview",
     anchors: [
       { title: "OCR playground", href: "#ocr-playground" },
+      { title: "Ledger builder", href: "#ledger-builder" },
       { title: "Authentication", href: "#authentication" },
       { title: "Idempotency", href: "#idempotency" },
       { title: "Errors", href: "#errors" },
@@ -448,8 +450,12 @@ export default function ReferencePage() {
               </div>
             </section>
 
-            <section id="ocr-playground" className="scroll-mt-24">
+            <section id="ocr-playground" className="scroll-mt-24 space-y-8">
               <MistralOcrPlayground />
+            </section>
+
+            <section id="ledger-builder" className="scroll-mt-24 space-y-8">
+              <LedgerBuilderPlayground />
             </section>
 
             <section id="authentication" className="scroll-mt-24 space-y-4">

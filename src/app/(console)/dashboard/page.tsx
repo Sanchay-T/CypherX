@@ -6,6 +6,7 @@ import { MetricCard } from "@/components/dashboard/metric-card";
 import { DashboardHeader } from "@/components/layout/dashboard-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { projects, recentActivity } from "@/data/projects";
 
@@ -54,6 +55,35 @@ export default function DashboardOverviewPage() {
           helper="Rotate stale keys every 30 days"
         />
       </div>
+
+      <Card className="border-border/70 bg-gradient-to-br from-background via-background to-primary/5">
+        <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <CardTitle className="text-base font-semibold">Live statement pipeline</CardTitle>
+            <CardDescription>
+              Simulated output from the new `/ai/statements/normalize` orchestration for demo purposes.
+            </CardDescription>
+          </div>
+          <Button asChild size="sm" variant="outline" className="gap-2">
+            <Link href="/docs/reference#ledger-builder">Launch playground</Link>
+          </Button>
+        </CardHeader>
+        <CardContent className="grid gap-4 sm:grid-cols-3">
+          {[
+            { name: "OCR", value: 100 },
+            { name: "Ledger normalization", value: 100 },
+            { name: "AI report", value: 76 },
+          ].map((stage) => (
+            <div key={stage.name} className="space-y-2">
+              <div className="flex items-center justify-between text-xs font-medium text-muted-foreground">
+                <span>{stage.name}</span>
+                <span>{stage.value}%</span>
+              </div>
+              <Progress value={stage.value} className="h-2" />
+            </div>
+          ))}
+        </CardContent>
+      </Card>
 
       <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
         <Card className="border-border/70">

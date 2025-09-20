@@ -26,6 +26,8 @@ httpx==0.28.1
 google-auth==2.37.0
 supabase==2.19.0
 tenacity==9.1.2
+openai==1.68.0
+weasyprint==62.0
 filelock==3.16.1
 fonttools==4.55.3
 fsspec==2024.12.0

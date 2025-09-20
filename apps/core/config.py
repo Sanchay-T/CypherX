@@ -68,6 +68,10 @@ class Settings(BaseSettings):
     mistral_location: str = Field(default="us-central1", alias="MISTRAL_LOCATION")
     mistral_model: str = Field(default="mistral-ocr-2505", alias="MISTRAL_MODEL")
 
+    openai_api_key: str | None = Field(default=None, alias="OPENAI_API_KEY")
+    open_api_key: str | None = Field(default=None, alias="OPEN_API_KEY")
+    openai_model: str = Field(default="gpt-4o", alias="OPENAI_MODEL")
+
     def model_post_init(self, __context: object) -> None:  # pragma: no cover - simple wiring
         if not self.supabase_service_role and self.supabase_service_role_legacy:
             object.__setattr__(
@@ -97,6 +101,8 @@ class Settings(BaseSettings):
             )
         if not self.supabase_jwt_secret and self.legacy_jwt_secret:
             object.__setattr__(self, "supabase_jwt_secret", self.legacy_jwt_secret)
+        if not self.openai_api_key and self.open_api_key:
+            object.__setattr__(self, "openai_api_key", self.open_api_key)
 
     @property
     def supabase_service_key(self) -> str:
@@ -188,6 +194,10 @@ class Settings(BaseSettings):
             f"{base_host}/v1/projects/{self.mistral_project}/locations/{location}/"
             f"publishers/mistralai/models/{self.mistral_model}"
         )
+
+    @property
+    def openai_enabled(self) -> bool:
+        return bool(self.openai_api_key)
 
 
 settings = Settings()

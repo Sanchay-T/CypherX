@@ -69,6 +69,7 @@ export default function PricingPage() {
               {plan.price === "Custom" ? (
                 <Button
                   asChild
+                  size="lg"
                   className="w-full"
                   variant={plan.highlight ? "default" : "outline"}
                 >
@@ -77,6 +78,7 @@ export default function PricingPage() {
               ) : (
                 <DashboardAwareButton
                   className="w-full"
+                  size="lg"
                   variant={plan.highlight ? "default" : "outline"}
                   signedOutHref="/signup"
                   signedOutLabel={plan.cta}
