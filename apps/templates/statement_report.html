@@ -6,214 +6,705 @@
   <style>
     @page {
       size: A4;
-      margin: 2.5cm 2cm;
+      margin: 2.1cm 1.7cm;
     }
+
+    :root {
+      --bg-gradient-start: #e8edff;
+      --bg-gradient-end: #f9fbff;
+      --surface: #ffffff;
+      --surface-muted: #f4f7ff;
+      --surface-outline: rgba(15, 23, 42, 0.08);
+      --surface-strong: rgba(15, 23, 42, 0.18);
+      --text: #0b1524;
+      --text-soft: #51607a;
+      --accent: #1d4ed8;
+      --accent-strong: rgba(29, 78, 216, 0.16);
+      --success: #16a34a;
+      --warning: #f59e0b;
+      --radius-lg: 18px;
+      --radius-sm: 10px;
+      --shadow-soft: 0 18px 44px rgba(15, 23, 42, 0.14);
+    }
+
     body {
-      font-family: "Helvetica Neue", Arial, sans-serif;
-      color: #1a1c1f;
       margin: 0;
       padding: 0;
-      font-size: 12px;
-      line-height: 1.5;
-      background: #f8f9fb;
+      font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
+      font-size: 11.5px;
+      line-height: 1.55;
+      color: var(--text);
+      background: linear-gradient(180deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 70%);
     }
+
+    main {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-soft);
+      padding: 28px 30px;
+    }
+
     header {
-      margin-bottom: 24px;
+      margin-bottom: 28px;
     }
+
+    .hero {
+      border-radius: var(--radius-lg);
+      background: linear-gradient(132deg, rgba(8, 18, 32, 0.96), rgba(29, 78, 216, 0.88));
+      color: #f8fbff;
+      padding: 26px 28px;
+    }
+
+    .hero-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
     .brand {
-      font-size: 20px;
-      letter-spacing: 1px;
+      font-size: 18px;
       font-weight: 700;
-      color: #111827;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
     }
+
     .badge {
-      display: inline-block;
-      padding: 4px 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
       border-radius: 999px;
-      background: #eef2ff;
-      color: #3730a3;
+      background: rgba(148, 163, 184, 0.24);
+      color: #e6ecff;
+      font-size: 10px;
       font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    .period-pill {
       font-size: 10px;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 10px;
+      letter-spacing: 0.12em;
+      color: var(--accent);
+      background: var(--accent-strong);
+      border-radius: 999px;
+      padding: 4px 12px;
     }
+
     h1 {
+      margin: 18px 0 14px;
       font-size: 26px;
-      margin: 8px 0 12px;
-      color: #111827;
+      font-weight: 700;
+      letter-spacing: -0.01em;
     }
+
     .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
       font-size: 11px;
-      color: #6b7280;
+      color: rgba(230, 240, 255, 0.82);
+    }
+
+    .meta-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .meta-item span {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: rgba(226, 232, 240, 0.6);
+    }
+
+    section.card {
+      position: relative;
+      background: var(--surface);
+      border: 1px solid var(--surface-outline);
+      border-radius: var(--radius-lg);
+      padding: 24px 26px 26px;
+      margin-bottom: 24px;
+      page-break-inside: avoid;
+      overflow: hidden;
+    }
+
+    section.card::before {
+      content: "";
+      position: absolute;
+      inset: 16px auto 16px 14px;
+      width: 4px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, rgba(29, 78, 216, 0.65), rgba(59, 130, 246, 0.35));
+    }
+
+    section.card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(226, 232, 240, 0.14), rgba(255, 255, 255, 0));
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 14px;
+      position: relative;
+    }
+
+    .card-header h2 {
+      margin: 0;
+      font-size: 15px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    .pill {
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      border-radius: 999px;
+      padding: 4px 10px;
+      background: rgba(29, 78, 216, 0.1);
+      color: var(--accent);
+    }
+
+    .lead {
+      margin: 0;
+      font-size: 12.5px;
+      color: var(--text-soft);
+    }
+
+    .metric-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-top: 18px;
+    }
+
+    .metric {
+      flex: 1 1 170px;
+      background: var(--surface-muted);
+      border: 1px solid rgba(29, 78, 216, 0.14);
+      border-radius: 14px;
+      padding: 14px 16px;
+    }
+
+    .metric span {
+      display: block;
+      font-size: 9.8px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .metric small {
+      display: block;
+      margin-top: 6px;
+      font-size: 10px;
+      color: var(--text-soft);
+    }
+
+    .section-body {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      position: relative;
+    }
+
+    .section-body p {
+      margin: 0;
+      color: var(--text-soft);
+      font-size: 12px;
+      padding-left: 14px;
+    }
+
+    .highlights {
+      padding-left: 20px;
+    }
+
+    .highlights ul {
+      margin: 0;
+      padding-left: 0;
+      list-style: none;
+    }
+
+    .highlights li {
+      margin-bottom: 6px;
+      color: var(--text);
+      position: relative;
+      padding-left: 12px;
+    }
+
+    .highlights li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 6px;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    .transactions {
+      padding-left: 20px;
+    }
+
+    .transactions li {
+      margin-bottom: 6px;
+      color: var(--text-soft);
+      position: relative;
+      padding-left: 12px;
+    }
+
+    .transactions li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 6px;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(22, 163, 74, 0.9);
+    }
+
+    .charts-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-top: 6px;
+    }
+
+    .chart-card {
+      flex: 1 1 220px;
+      position: relative;
+      background: linear-gradient(160deg, #f9fbff 0%, #f1f5ff 100%);
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      border-radius: 16px;
+      padding: 18px;
+      overflow: hidden;
+    }
+
+    .generated-charts {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .generated-chart-card {
+      flex: 1 1 240px;
+      background: #ffffff;
+      border: 1px solid var(--surface-outline);
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 10px 28px rgba(15, 23, 42, 0.12);
+    }
+
+    .generated-chart-card h3 {
+      margin: 0 0 8px;
+      font-size: 13px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .generated-chart-card p {
+      margin: 8px 0 0;
+      font-size: 10.5px;
+      color: var(--text-soft);
+    }
+
+    .generated-chart-card img {
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid rgba(15, 23, 42, 0.12);
+      margin-top: 6px;
+    }
+
+    .chart-card h3 {
+      margin: 0 0 8px;
+      font-size: 13px;
+      color: var(--text);
+    }
+
+    .chart-type {
+      display: inline-block;
+      font-size: 9px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.08);
+      color: rgba(15, 23, 42, 0.72);
+      margin-bottom: 8px;
+    }
+
+    .chart-visual {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 14px;
+      gap: 12px;
+    }
+
+    .chart-visual--bar {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 6px;
+    }
+
+    .chart-visual--bar span {
+      display: block;
+      height: 10px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(29, 78, 216, 0.25), rgba(29, 78, 216, 0.85));
+    }
+
+    .chart-visual--pie::before {
+      content: "";
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: conic-gradient(
+        rgba(29, 78, 216, 0.85) 0 130deg,
+        rgba(37, 157, 224, 0.85) 130deg 220deg,
+        rgba(203, 213, 225, 0.6) 220deg 360deg
+      );
+      box-shadow: inset 0 0 0 6px rgba(255, 255, 255, 0.9);
+    }
+
+    .chart-visual--donut::before {
+      content: "";
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: conic-gradient(
+        rgba(29, 78, 216, 0.85) 0 180deg,
+        rgba(22, 163, 74, 0.75) 180deg 270deg,
+        rgba(203, 213, 225, 0.6) 270deg 360deg
+      );
+      box-shadow: inset 0 0 0 10px var(--surface);
+    }
+
+    .chart-visual--line {
+      position: relative;
+      height: 68px;
+      border-radius: 10px;
+      background: linear-gradient(180deg, rgba(29, 78, 216, 0.08), rgba(29, 78, 216, 0));
+      overflow: hidden;
+    }
+
+    .chart-visual--line::before {
+      content: "";
+      position: absolute;
+      inset: 12px;
+      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="140" height="40" viewBox="0 0 140 40"><polyline fill="none" stroke="%231d4ed8" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" points="0,30 25,18 50,26 75,12 100,20 125,8 140,16"/></svg>') center/contain no-repeat;
+      opacity: 0.9;
+    }
+
+    .chart-metrics {
+      margin: 0;
+      padding-left: 16px;
+      font-size: 10.5px;
+      color: var(--text-soft);
+    }
+
+    .table-wrapper {
+      border: 1px solid var(--surface-outline);
+      border-radius: var(--radius-lg);
+      background: var(--surface);
+      overflow: hidden;
+      margin-top: 10px;
+    }
+
+    .table-header-strip {
       display: flex;
       justify-content: space-between;
-      flex-wrap: wrap;
+      align-items: center;
+      padding: 14px 16px;
+      background: linear-gradient(90deg, rgba(29, 78, 216, 0.08), rgba(29, 78, 216, 0.02));
+      border-bottom: 1px solid rgba(29, 78, 216, 0.12);
     }
-    .card {
-      background: white;
-      border-radius: 16px;
-      padding: 18px 20px;
-      margin-bottom: 18px;
-      box-shadow: 0 12px 24px rgba(15, 23, 42, 0.06);
-    }
-    .card h2 {
-      font-size: 16px;
-      margin: 0 0 6px;
-      color: #1e293b;
-    }
-    .card h3 {
-      font-size: 14px;
-      margin: 14px 0 6px;
-      color: #0f172a;
-    }
-    ul {
+
+    .table-header-strip h3 {
       margin: 0;
-      padding-left: 18px;
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text);
     }
-    ul li {
-      margin-bottom: 4px;
-    }
+
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 12px;
-      font-size: 11px;
+      font-size: 10.4px;
+      table-layout: fixed;
+      font-feature-settings: "tnum" 1;
     }
-    table thead {
-      background: #f1f5f9;
+
+    thead {
+      display: table-header-group;
+      background: #f3f6ff;
+    }
+
+    th,
+    td {
+      padding: 9px 11px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.28);
+      text-align: left;
+      vertical-align: top;
+      word-break: break-word;
+    }
+
+    th {
+      font-weight: 600;
+      font-size: 10px;
       text-transform: uppercase;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.14em;
+      color: rgba(15, 23, 42, 0.85);
+    }
+
+    tbody tr:nth-child(odd) {
+      background: rgba(241, 245, 249, 0.32);
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    tbody tr {
+      page-break-inside: avoid;
+    }
+
+    .amount-positive {
+      color: var(--success);
       font-weight: 600;
     }
-    table th, table td {
-      padding: 8px 10px;
-      border: 1px solid #e2e8f0;
-      text-align: left;
+
+    .amount-negative {
+      color: var(--warning);
+      font-weight: 600;
     }
-    .metric-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 10px;
-      margin-top: 12px;
+
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, rgba(15, 23, 42, 0), rgba(15, 23, 42, 0.12), rgba(15, 23, 42, 0));
+      margin: 30px 0 18px;
     }
-    .metric {
-      background: linear-gradient(135deg, #f8fafc, #eef2ff);
-      border-radius: 12px;
-      padding: 12px;
-    }
-    .metric span {
-      display: block;
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: #4f46e5;
-      margin-bottom: 6px;
-    }
-    .metric strong {
-      font-size: 16px;
-      color: #1e293b;
-    }
-    .muted {
-      color: #6b7280;
-    }
+
     .footnote {
-      margin-top: 24px;
-      font-size: 10px;
-      color: #94a3b8;
+      font-size: 9.8px;
+      color: var(--text-soft);
       text-align: center;
+      letter-spacing: 0.04em;
+    }
+
+    .watermark {
+      display: block;
+      margin-top: 6px;
+      font-size: 8.5px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(15, 23, 42, 0.35);
     }
   </style>
 </head>
 <body>
-  <header>
-    <div class="badge">CypherX Statement Insights</div>
-    <div class="brand">CypherX Labs</div>
-    <h1>{{ headline }}</h1>
-    <div class="meta">
-      <div><strong>Prepared for:</strong> {{ prepared_for }}</div>
-      <div><strong>Period:</strong> {{ period }}</div>
-      <div><strong>Generated on:</strong> {{ generated_at }}</div>
-    </div>
-  </header>
-
-  <section class="card">
-    <h2>Executive Summary</h2>
-    <p>{{ executive_summary }}</p>
-    <div class="metric-grid">
-      {% for metric in key_metrics %}
-      <div class="metric">
-        <span>{{ metric.label }}</span>
-        {% if metric.format == 'inr' %}
-          <strong>{{ metric.value|inr }}</strong>
-        {% else %}
-          <strong>{{ metric.value }}</strong>
-        {% endif %}
-        {% if metric.note %}<div class="muted" style="margin-top:4px;">{{ metric.note }}</div>{% endif %}
+  <main>
+    <header>
+      <div class="hero">
+        <div class="hero-top">
+          <div>
+            <div class="brand">CypherX Labs</div>
+            <div class="badge">Statement Intelligence Report</div>
+          </div>
+          <div class="period-pill">{{ period }}</div>
+        </div>
+        <h1>{{ headline }}</h1>
+        <div class="meta">
+          <div class="meta-item">
+            <span>Prepared for</span>
+            <strong>{{ prepared_for }}</strong>
+          </div>
+          <div class="meta-item">
+            <span>Generated on</span>
+            <strong>{{ generated_at }}</strong>
+          </div>
+        </div>
       </div>
-      {% endfor %}
-    </div>
-  </section>
+    </header>
 
-  {% for section in sections %}
-  <section class="card">
-    <h2>{{ section.heading }}</h2>
-    <p>{{ section.summary }}</p>
-    {% if section.bullet_points %}
-    <h3>Highlights</h3>
-    <ul>
-      {% for bullet in section.bullet_points %}
-      <li>{{ bullet }}</li>
-      {% endfor %}
-    </ul>
-    {% endif %}
-
-    {% if section.highlight_transactions %}
-    <h3>Key transactions</h3>
-    <ul>
-      {% for tx in section.highlight_transactions %}
-      <li>{{ tx }}</li>
-      {% endfor %}
-    </ul>
-    {% endif %}
-  </section>
-  {% endfor %}
-
-  {% if charts %}
-  <section class="card">
-    <h2>Suggested Visualisations</h2>
-    <ul>
-      {% for chart in charts %}
-      <li><strong>{{ chart.title }}</strong> — {{ chart.description }} ({{ chart.chart_type }})</li>
-      {% endfor %}
-    </ul>
-  </section>
-  {% endif %}
-
-  {% if transaction_sample %}
-  <section class="card">
-    <h2>Sample Transactions</h2>
-    <table>
-      <thead>
-        <tr>
-          {% for header in transaction_sample.headers %}
-          <th>{{ header }}</th>
+    <section class="card">
+      <div class="card-header">
+        <h2>Executive Summary</h2>
+        <div class="pill">Key signals</div>
+      </div>
+      <div class="section-body">
+        <p class="lead">{{ executive_summary }}</p>
+        <div class="metric-grid">
+          {% for metric in key_metrics %}
+          <div class="metric">
+            <span>{{ metric.label }}</span>
+            {% if metric.format == 'inr' %}
+              <strong>{{ metric.value|inr }}</strong>
+            {% else %}
+              <strong>{{ metric.value }}</strong>
+            {% endif %}
+            {% if metric.note %}
+            <small>{{ metric.note }}</small>
+            {% endif %}
+          </div>
           {% endfor %}
-        </tr>
-      </thead>
-      <tbody>
-        {% for row in transaction_sample.rows %}
-        <tr>
-          {% for cell in row %}
-          <td>{{ cell }}</td>
-          {% endfor %}
-        </tr>
+        </div>
+      </div>
+    </section>
+
+    {% for section in sections %}
+    <section class="card">
+      <div class="card-header">
+        <h2>{{ section.heading }}</h2>
+      </div>
+      <div class="section-body">
+        <p>{{ section.summary }}</p>
+        {% if section.bullet_points %}
+        <div class="highlights">
+          <ul>
+            {% for bullet in section.bullet_points %}
+            <li>{{ bullet }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+
+        {% if section.highlight_transactions %}
+        <div class="transactions">
+          <ul>
+            {% for tx in section.highlight_transactions %}
+            <li>{{ tx }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+      </div>
+    </section>
+    {% endfor %}
+
+    {% if auto_charts %}
+    <section class="card">
+      <div class="card-header">
+        <h2>Automated Visual Snapshots</h2>
+        <div class="pill">Generated from sample data</div>
+      </div>
+      <div class="generated-charts">
+        {% for chart in auto_charts %}
+        <div class="generated-chart-card">
+          <h3>{{ chart.title }}</h3>
+          <img src="{{ chart.path }}" alt="{{ chart.description }}" />
+          <p>{{ chart.description }}</p>
+        </div>
         {% endfor %}
-      </tbody>
-    </table>
-  </section>
-  {% endif %}
+      </div>
+    </section>
+    {% endif %}
 
-  <p class="footnote">Confidential. Generated by CypherX AI pipeline.</p>
+    {% if charts %}
+    <section class="card">
+      <div class="card-header">
+        <h2>Analyst Visualisation Brief</h2>
+        <div class="pill">Build queue</div>
+      </div>
+      <div class="charts-grid">
+        {% for chart in charts %}
+        {% set chart_type = (chart.chart_type or 'bar')|lower %}
+        {% if 'pie' in chart_type %}
+          {% set visual_class = 'chart-visual chart-visual--pie' %}
+        {% elif 'donut' in chart_type %}
+          {% set visual_class = 'chart-visual chart-visual--donut' %}
+        {% elif 'line' in chart_type %}
+          {% set visual_class = 'chart-visual chart-visual--line' %}
+        {% else %}
+          {% set visual_class = 'chart-visual chart-visual--bar' %}
+        {% endif %}
+        <div class="chart-card">
+          <div class="chart-type">{{ chart.chart_type | upper }}</div>
+          <h3>{{ chart.title }}</h3>
+          <div class="{{ visual_class }}">
+            {% if 'chart-visual--bar' in visual_class %}
+              <span style="width: 100%;"></span>
+              <span style="width: 72%;"></span>
+              <span style="width: 48%;"></span>
+            {% else %}
+              <!-- static visual rendered by CSS -->
+            {% endif %}
+          </div>
+          <p class="lead">{{ chart.description }}</p>
+          {% if chart.metrics %}
+          <ul class="chart-metrics">
+            {% for metric in chart.metrics %}
+            <li>{{ metric }}</li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+    {% endif %}
+
+    {% if transaction_sample %}
+    <section class="card">
+      <div class="card-header">
+        <h2>Sample Transactions</h2>
+        <div class="pill">Ledger excerpt</div>
+      </div>
+      <div class="table-wrapper">
+        <div class="table-header-strip">
+          <h3>Statement excerpt</h3>
+          <div class="pill">Ledger sample</div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              {% for header in transaction_sample.headers %}
+              <th>{{ header }}</th>
+              {% endfor %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in transaction_sample.rows %}
+            <tr>
+              {% for cell in row %}
+              <td>{{ cell }}</td>
+              {% endfor %}
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+    {% endif %}
+
+    <div class="divider"></div>
+    <p class="footnote">
+      Confidential briefing generated by CypherX AI pipeline.
+      <span class="watermark">AI Assisted • Template: {{ template_name }}</span>
+    </p>
+  </main>
 </body>
 </html>

@@ -36,6 +36,7 @@ class StatementJobContext:
     file_path: Path
     file_name: str
     prompt: str | None
+    template: str | None
 
 
 class StatementPipelineService:
@@ -60,8 +61,15 @@ class StatementPipelineService:
         job_dir.mkdir(parents=True, exist_ok=True)
         return job_dir
 
-    async def create_job(self, *, file_bytes: bytes, file_name: str, prompt: str | None) -> dict[str, Any]:
-        job = await self._jobs.create(payload={"file_name": file_name, "prompt": prompt})
+    async def create_job(
+        self,
+        *,
+        file_bytes: bytes,
+        file_name: str,
+        prompt: str | None,
+        template: str | None,
+    ) -> dict[str, Any]:
+        job = await self._jobs.create(payload={"file_name": file_name, "prompt": prompt, "template": template})
         job_dir = self._job_dir(job.job_id)
         pdf_path = job_dir / file_name
         pdf_path.write_bytes(file_bytes)
@@ -71,6 +79,7 @@ class StatementPipelineService:
             file_path=pdf_path,
             file_name=file_name,
             prompt=prompt,
+            template=template,
         )
 
         asyncio.create_task(self._run_job(context))
@@ -94,6 +103,7 @@ class StatementPipelineService:
                 "stages": stages,
                 "started_at": started_at.isoformat(),
                 "completed_at": None,
+                "report_template": context.template,
             }
             LOGGER.debug("Job %s stage=queued payload=%s", context.job_id, result)
             await self._jobs.update(context.job_id, result=result)
@@ -127,6 +137,7 @@ class StatementPipelineService:
                     legacy_summary,
                     ocr_result,
                     context.prompt,
+                    context.template,
                     context.job_id,
                 )
                 if report_payload:
@@ -244,6 +255,7 @@ class StatementPipelineService:
         summary: dict[str, Any],
         ocr_result: MistralOcrResponse,
         prompt: str | None,
+        template: str | None,
         job_id: str,
     ) -> dict[str, Any] | None:
         workspace = self._job_dir(job_id) / "report"
@@ -255,10 +267,12 @@ class StatementPipelineService:
             "ocr_cost": ocr_result.cost.model_dump() if ocr_result.cost else None,
             "preview": summary.get("preview"),
             "pdfs": summary.get("pdfs"),
+            "template": template,
         }
         return self._reports.build_report(
             statement_summary=statement_summary,
             prompt=prompt,
+            template=template,
             workspace=workspace,
         )
 

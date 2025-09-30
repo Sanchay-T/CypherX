@@ -1,0 +1,18 @@
+{
+  "template": "lending_india",
+  "headline": "India Lending Portfolio Risk Brief \u2013 Stub",
+  "executive_summary": "Stub summary for axis.pdf smoke test run.",
+  "sections": [
+    {
+      "heading": "Portfolio Scale & Mix",
+      "summary": "Axis sample processed for lending template demo.",
+      "bullet_points": [
+        "Total credits \u20b9250,000; total debits \u20b9202,000",
+        "PSL exposure assumed at 41.5% with \u20b938 Cr shortfall"
+      ],
+      "highlight_transactions": [
+        "Action: Review Greenfield Auto (61-90 DPD)."
+      ]
+    }
+  ]
+}

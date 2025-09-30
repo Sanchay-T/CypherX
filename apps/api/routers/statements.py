@@ -13,6 +13,7 @@ router = APIRouter(prefix="/ai/statements", tags=["ai"])
 async def normalize_statement(
     file: UploadFile = File(...),
     report_prompt: str | None = Form(default=None),
+    report_template: str | None = Form(default=None),
     pipeline: StatementPipelineService = Depends(get_statement_pipeline),
 ):
     if file.content_type not in {"application/pdf", "application/octet-stream"}:
@@ -22,7 +23,12 @@ async def normalize_statement(
     if not data:
         raise HTTPException(status_code=400, detail="Empty file upload")
 
-    job = await pipeline.create_job(file_bytes=data, file_name=file.filename or "statement.pdf", prompt=report_prompt)
+    job = await pipeline.create_job(
+        file_bytes=data,
+        file_name=file.filename or "statement.pdf",
+        prompt=report_prompt,
+        template=report_template,
+    )
     return job
 
 

@@ -12,6 +12,23 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Progress } from "@/components/ui/progress"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+
+const TEMPLATE_DEFINITIONS = {
+  standard: {
+    label: "Standard overview",
+    description: "Focus on cash flow health, risk flags, and customer insights.",
+    defaultPrompt: "Focus on cash flow health, risk flags, and customer insights.",
+  },
+  lending_india: {
+    label: "Lending – India (RBI)",
+    description: "Surface GNPA, SMA ladder, PSL compliance, collateral coverage, and supervisory actions.",
+    defaultPrompt:
+      "You are preparing an India lending portfolio brief. Prioritise GNPA/NNPA, SMA 0/1/2 pipeline, PSL progress, collateral coverage, liquidity gaps, and compliance breaches. Provide explicit Action or Monitor call-outs for each section.",
+  },
+} as const
+
+type ReportTemplateKey = keyof typeof TEMPLATE_DEFINITIONS
 
 const API_BASE_URL = (process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000").replace(/\/$/, "")
 const DEFAULT_SAMPLE_URL = "/samples/axis.pdf"
@@ -30,7 +47,7 @@ interface JobRecord {
 interface StatementResult {
   file_name: string
   excel?: { path: string | null; download_token: string }
-  report?: { plan: Record<string, unknown>; pdf_path: string }
+  report?: { plan: Record<string, unknown>; pdf_path: string; template?: string | null }
   ocr?: Record<string, unknown>
   preview?: {
     totals: { credits: number; debits: number }
@@ -40,6 +57,7 @@ interface StatementResult {
   stages: Array<{ name: string; duration_ms: number; finished_at: string }>
   started_at: string
   completed_at: string
+  report_template?: string | null
 }
 
 type StageState = "pending" | "running" | "completed" | "skipped" | "failed"
@@ -97,7 +115,8 @@ export function LedgerBuilderPlayground(): JSX.Element {
   const [job, setJob] = useState<JobRecord | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isDragging, setIsDragging] = useState(false)
-  const [reportPrompt, setReportPrompt] = useState<string>("Highlight risk, cash flow, and compliance flags.")
+  const [reportTemplate, setReportTemplate] = useState<ReportTemplateKey>("standard")
+  const [reportPrompt, setReportPrompt] = useState<string>(TEMPLATE_DEFINITIONS.standard.defaultPrompt)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [currentFileName, setCurrentFileName] = useState<string | null>(null)
   const currencyFormatter = useMemo(() => new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR" }), [])
@@ -110,6 +129,7 @@ export function LedgerBuilderPlayground(): JSX.Element {
         const formData = new FormData()
         formData.append("file", file)
         formData.append("report_prompt", reportPrompt)
+        formData.append("report_template", reportTemplate)
         const response = await fetch(`${API_BASE_URL}/ai/statements/normalize`, {
           method: "POST",
           body: formData,
@@ -131,7 +151,7 @@ export function LedgerBuilderPlayground(): JSX.Element {
         setIsSubmitting(false)
       }
     },
-    [reportPrompt],
+    [reportPrompt, reportTemplate],
   )
 
   const handleFiles = useCallback(
@@ -384,6 +404,31 @@ export function LedgerBuilderPlayground(): JSX.Element {
             </div>
 
             <div className="space-y-3">
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-medium text-foreground" htmlFor="report_template">
+                  Report template
+                </label>
+                <Select
+                  value={reportTemplate}
+                  onValueChange={(value) => {
+                    const templateKey = value as ReportTemplateKey
+                    setReportTemplate(templateKey)
+                    setReportPrompt(TEMPLATE_DEFINITIONS[templateKey].defaultPrompt)
+                  }}
+                >
+                  <SelectTrigger id="report_template" className="w-full">
+                    <SelectValue placeholder="Select a template" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.entries(TEMPLATE_DEFINITIONS).map(([key, config]) => (
+                      <SelectItem key={key} value={key} className="flex flex-col items-start gap-0.5">
+                        <span className="text-sm font-medium">{config.label}</span>
+                        <span className="text-xs text-muted-foreground">{config.description}</span>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
               <label className="text-sm font-medium text-foreground" htmlFor="report_prompt">
                 Custom report instructions
               </label>
