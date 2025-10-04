@@ -88,7 +88,15 @@ def _normalise_paths(pdf_paths: Sequence[str]) -> list[pathlib.Path]:
     return resolved
 
 
-def run_legacy(pdf_paths: Sequence[str], *, ocr: bool = True) -> Tuple[str, Dict[str, Any]]:
+def run_legacy(
+    pdf_paths: Sequence[str],
+    *,
+    ocr: bool = True,
+    bank_names: Sequence[str] | None = None,
+    passwords: Sequence[str] | None = None,
+    start_dates: Sequence[str] | None = None,
+    end_dates: Sequence[str] | None = None,
+) -> Tuple[str, Dict[str, Any]]:
     if not pdf_paths:
         raise ValueError("No PDFs provided")
 
@@ -98,16 +106,24 @@ def run_legacy(pdf_paths: Sequence[str], *, ocr: bool = True) -> Tuple[str, Dict
     with chdir(str(legacy_dir)):
         start_extraction_add_pdf, save_to_excel = _import_legacy_symbols()
 
-        bank_names = list(_infer_bank_names(resolved_paths))
-        blanks = [""] * len(bank_names)
+        # Use provided bank names or infer from filenames
+        if not bank_names:
+            bank_names = list(_infer_bank_names(resolved_paths))
+
+        # Prepare parameters with defaults if not provided
+        num_files = len(bank_names)
+        passwords = list(passwords) if passwords else [""] * num_files
+        start_dates = list(start_dates) if start_dates else [""] * num_files
+        end_dates = list(end_dates) if end_dates else [""] * num_files
+
         progress_data = {"progress_func": lambda *_: None, "current_progress": 0, "total_progress": 100}
 
         result = start_extraction_add_pdf(  # type: ignore[misc]
-            bank_names,
+            list(bank_names),
             [str(path) for path in resolved_paths],
-            blanks,
-            blanks,
-            blanks,
+            passwords,
+            start_dates,
+            end_dates,
             "CODEx-bridge",
             progress_data,
             whole_transaction_sheet=None,
@@ -115,11 +131,20 @@ def run_legacy(pdf_paths: Sequence[str], *, ocr: bool = True) -> Tuple[str, Dict
         )
 
         if not isinstance(result, dict):
-            raise RuntimeError("Legacy entrypoint returned unexpected payload")
+            raise RuntimeError(f"Legacy entrypoint returned unexpected payload: {type(result)}")
+
+        # Log what we got from legacy system
+        print(f"DEBUG: Legacy result keys: {list(result.keys())}")
+        print(f"DEBUG: pdf_paths_not_extracted: {result.get('pdf_paths_not_extracted')}")
 
         raw_json = result.get("sheets_in_json")
         if not raw_json:
-            raise RuntimeError("Legacy entrypoint did not return sheet data")
+            error_details = {
+                "result_keys": list(result.keys()),
+                "pdf_paths_not_extracted": result.get("pdf_paths_not_extracted"),
+                "success_page_number": result.get("success_page_number"),
+            }
+            raise RuntimeError(f"Legacy entrypoint did not return sheet data. Result: {json.dumps(error_details)}")
 
         sheets_payload = json.loads(raw_json)
         transactions = sheets_payload.get("Transactions") or []
@@ -153,6 +178,7 @@ def run_legacy(pdf_paths: Sequence[str], *, ocr: bool = True) -> Tuple[str, Dict
         summary: Dict[str, Any] = {
             "pdfs": [str(path) for path in resolved_paths],
             "excel_path": excel_path,
+            "sheets_data": sheets_payload,  # Include raw JSON data from legacy system
             "legacy": {
                 "missing_months_list": result.get("missing_months_list"),
                 "pdf_paths_not_extracted": result.get("pdf_paths_not_extracted"),

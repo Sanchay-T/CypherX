@@ -1,7 +1,9 @@
 import {
   BookOpen,
+  Building2,
   CreditCard,
   FileKey2,
+  FileSpreadsheet,
   GaugeCircle,
   Home,
   LifeBuoy,
@@ -73,6 +75,8 @@ export const footerNav: NavSection[] = [
 export const dashboardSidebarNav: SidebarItem[] = [
   { title: "Overview", href: "/dashboard", icon: Home },
   { title: "Projects", href: "/dashboard/projects", icon: PanelsTopLeft },
+  { title: "Analyzed Statements", href: "/dashboard/statements", icon: FileSpreadsheet },
+  { title: "Master Entity Panel", href: "/dashboard/entities", icon: Building2, badge: "NEW" },
   { title: "API Explorer", href: "/dashboard/explorer", icon: SquareTerminal },
   { title: "Usage & Health", href: "/dashboard/monitoring", icon: GaugeCircle },
   { title: "Docs", href: "/docs", icon: BookOpen },

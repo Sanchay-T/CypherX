@@ -1,0 +1,216 @@
+[
+  {
+    "id": "entity_demo_2",
+    "name": "Business A",
+    "type": "company",
+    "aliases": [
+      "Business A Pvt Ltd",
+      "BusinessA"
+    ],
+    "match_count": 150
+  },
+  {
+    "id": "entity_4",
+    "name": "imran",
+    "type": "person",
+    "aliases": [
+      "imran sable "
+    ],
+    "match_count": 0
+  },
+  {
+    "id": "entity_3",
+    "name": "John Doe",
+    "type": "person",
+    "aliases": [
+      "J Doe",
+      "John D",
+      "Johnny"
+    ],
+    "match_count": 0
+  },
+  {
+    "id": "entity_4",
+    "name": "Acme Corporation",
+    "type": "company",
+    "aliases": [
+      "Acme Corp",
+      "ACME"
+    ],
+    "match_count": 0
+  },
+  {
+    "id": "entity_5",
+    "name": "Tech Solutions",
+    "type": "business",
+    "aliases": [
+      "Tech Sol",
+      "TechSolutions Pvt Ltd"
+    ],
+    "match_count": 0
+  },
+  {
+    "id": "entity_6",
+    "name": "Jane Smith",
+    "type": "person",
+    "aliases": [
+      "J Smith",
+      "Jane S"
+    ],
+    "match_count": 0
+  },
+  {
+    "id": "entity_7",
+    "name": "Global Traders",
+    "type": "business",
+    "aliases": [
+      "Global Trading Co",
+      "GT"
+    ],
+    "match_count": 84
+  },
+  {
+    "id": "entity_8",
+    "name": "Microsoft India",
+    "type": "company",
+    "aliases": [
+      "Microsoft",
+      "MS India",
+      "MSFT"
+    ],
+    "match_count": 0
+  },
+  {
+    "id": "entity_9",
+    "name": "Ramesh Kumar",
+    "type": "person",
+    "aliases": [
+      "R Kumar",
+      "Ramesh K"
+    ],
+    "match_count": 0
+  },
+  {
+    "id": "entity_10",
+    "name": "Infosys Limited",
+    "type": "company",
+    "aliases": [
+      "Infosys",
+      "Infy"
+    ],
+    "match_count": 0
+  },
+  {
+    "id": "entity_11",
+    "name": "Amazon Pay",
+    "type": "company",
+    "aliases": [
+      "Amazon",
+      "AMZN",
+      "Amazon India"
+    ],
+    "match_count": 52
+  },
+  {
+    "id": "entity_12",
+    "name": "Flipkart",
+    "type": "company",
+    "aliases": [
+      "Flipkart Internet",
+      "FK"
+    ],
+    "match_count": 0
+  },
+  {
+    "id": "entity_13",
+    "name": "John Doe",
+    "type": "person",
+    "aliases": [
+      "J Doe",
+      "John D",
+      "Johnny"
+    ],
+    "match_count": 0
+  },
+  {
+    "id": "entity_14",
+    "name": "Acme Corporation",
+    "type": "company",
+    "aliases": [
+      "Acme Corp",
+      "ACME"
+    ],
+    "match_count": 0
+  },
+  {
+    "id": "entity_15",
+    "name": "Tech Solutions",
+    "type": "business",
+    "aliases": [
+      "Tech Sol",
+      "TechSolutions Pvt Ltd"
+    ],
+    "match_count": 0
+  },
+  {
+    "id": "entity_16",
+    "name": "Jane Smith",
+    "type": "person",
+    "aliases": [
+      "J Smith",
+      "Jane S"
+    ],
+    "match_count": 0
+  },
+  {
+    "id": "entity_17",
+    "name": "John Doe",
+    "type": "person",
+    "aliases": [
+      "J Doe",
+      "John D",
+      "Johnny"
+    ],
+    "match_count": 0
+  },
+  {
+    "id": "entity_18",
+    "name": "Acme Corporation",
+    "type": "company",
+    "aliases": [
+      "Acme Corp",
+      "ACME"
+    ],
+    "match_count": 0
+  },
+  {
+    "id": "entity_19",
+    "name": "Tech Solutions",
+    "type": "business",
+    "aliases": [
+      "Tech Sol",
+      "TechSolutions Pvt Ltd"
+    ],
+    "match_count": 0
+  },
+  {
+    "id": "entity_20",
+    "name": "Jane Smith",
+    "type": "person",
+    "aliases": [
+      "J Smith",
+      "Jane S"
+    ],
+    "match_count": 0
+  },
+  {
+    "id": "entity_21",
+    "name": "Global Traders",
+    "type": "business",
+    "aliases": [
+      "Global Trading Co",
+      "GT"
+    ],
+    "match_count": 21
+  }
+]
