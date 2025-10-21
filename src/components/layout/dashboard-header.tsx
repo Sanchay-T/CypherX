@@ -41,22 +41,26 @@ export function DashboardHeader({ title, description, actions }: DashboardHeader
 
             if (isLast) {
               return (
-                <BreadcrumbItem key={href}>
+                <div key={href} className="contents">
                   <BreadcrumbSeparator />
-                  <BreadcrumbPage className="capitalize">{segment.replace(/-/g, " ")}</BreadcrumbPage>
-                </BreadcrumbItem>
+                  <BreadcrumbItem>
+                    <BreadcrumbPage className="capitalize">{segment.replace(/-/g, " ")}</BreadcrumbPage>
+                  </BreadcrumbItem>
+                </div>
               );
             }
 
             return (
-              <BreadcrumbItem key={href}>
+              <div key={href} className="contents">
                 <BreadcrumbSeparator />
-                <BreadcrumbLink asChild>
-                  <Link href={href} className="capitalize">
-                    {segment.replace(/-/g, " ")}
-                  </Link>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
+                <BreadcrumbItem>
+                  <BreadcrumbLink asChild>
+                    <Link href={href} className="capitalize">
+                      {segment.replace(/-/g, " ")}
+                    </Link>
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+              </div>
             );
           })}
         </BreadcrumbList>

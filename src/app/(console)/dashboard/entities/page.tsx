@@ -143,6 +143,7 @@ export default function EntitiesPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: entity.name,
+          type: entity.type,
           aliases: entity.aliases,
         }),
       });
@@ -481,7 +482,7 @@ Global Traders,business,"Global Trading Co,GT"`;
             <DialogDescription>Sample matches from recent statements</DialogDescription>
           </DialogHeader>
 
-          {previewData && previewData.sample_matches.length > 0 ? (
+          {previewData?.sample_matches?.length > 0 ? (
             <div className="space-y-2 max-h-[400px] overflow-y-auto">
               {previewData.sample_matches.map((match: PreviewMatch, i: number) => (
                 <div key={i} className="border rounded-lg p-3 hover:bg-muted/50">
