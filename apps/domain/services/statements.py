@@ -146,7 +146,24 @@ class StatementPipelineService:
             template=template,
         )
 
-        asyncio.create_task(self._run_job(context))
+        # Enqueue Celery task for background processing
+        from apps.tasks.statements import process_statement_task
+
+        process_statement_task.apply_async(
+            kwargs={
+                "job_id": str(job.id),
+                "download_token": str(download_token),
+                "file_path": str(pdf_path),
+                "file_name": file_name,
+                "bank_name": bank_name,
+                "password": password,
+                "financial_year": financial_year,
+                "prompt": prompt,
+                "template": template,
+            },
+            task_id=str(job.id),  # Use job ID as task ID for tracking
+        )
+
         return job_snapshot
 
     async def _run_job(self, context: StatementJobContext) -> None:

@@ -72,6 +72,32 @@ class Settings(BaseSettings):
     open_api_key: str | None = Field(default=None, alias="OPEN_API_KEY")
     openai_model: str = Field(default="gpt-4o", alias="OPENAI_MODEL")
 
+    # Redis Configuration
+    redis_url: str = Field(default="redis://localhost:6379/0", alias="REDIS_URL")
+    redis_max_connections: int = Field(default=50, alias="REDIS_MAX_CONNECTIONS")
+    redis_socket_timeout: int = Field(default=5, alias="REDIS_SOCKET_TIMEOUT")
+    redis_socket_connect_timeout: int = Field(default=5, alias="REDIS_SOCKET_CONNECT_TIMEOUT")
+
+    # Cache Configuration
+    cache_default_ttl: int = Field(default=300, alias="CACHE_DEFAULT_TTL")
+    cache_enabled: bool = Field(default=True, alias="CACHE_ENABLED")
+
+    # Database Pool Configuration
+    db_pool_size: int = Field(default=20, alias="DB_POOL_SIZE")
+    db_max_overflow: int = Field(default=10, alias="DB_MAX_OVERFLOW")
+    db_pool_timeout: int = Field(default=30, alias="DB_POOL_TIMEOUT")
+    db_pool_recycle: int = Field(default=3600, alias="DB_POOL_RECYCLE")
+    db_echo: bool = Field(default=False, alias="DB_ECHO")
+
+    # CORS Configuration
+    frontend_url: str = Field(default="http://localhost:3000", alias="FRONTEND_URL")
+    allowed_hosts: str = Field(default="localhost,127.0.0.1", alias="ALLOWED_HOSTS")
+
+    # Celery Configuration
+    celery_broker_url: str | None = Field(default=None, alias="CELERY_BROKER_URL")
+    celery_result_backend: str | None = Field(default=None, alias="CELERY_RESULT_BACKEND")
+    celery_task_always_eager: bool = Field(default=False, alias="CELERY_TASK_ALWAYS_EAGER")
+
     def model_post_init(self, __context: object) -> None:  # pragma: no cover - simple wiring
         if not self.supabase_service_role and self.supabase_service_role_legacy:
             object.__setattr__(
@@ -198,6 +224,16 @@ class Settings(BaseSettings):
     @property
     def openai_enabled(self) -> bool:
         return bool(self.openai_api_key)
+
+    @property
+    def celery_broker(self) -> str:
+        """Celery broker URL, defaults to Redis."""
+        return self.celery_broker_url or self.redis_url
+
+    @property
+    def celery_backend(self) -> str:
+        """Celery result backend URL, defaults to Redis."""
+        return self.celery_result_backend or self.redis_url
 
 
 settings = Settings()

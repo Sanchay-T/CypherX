@@ -8,7 +8,7 @@ from urllib.parse import quote
 
 from sqlalchemy.engine import make_url
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
-from sqlalchemy.pool import NullPool
+from sqlalchemy.pool import QueuePool
 
 from apps.core.config import settings
 
@@ -40,7 +40,13 @@ def _build_async_dsn(dsn: str) -> str:
 
 async_engine: AsyncEngine = create_async_engine(
     _build_async_dsn(settings.database_dsn),
-    poolclass=NullPool,
+    poolclass=QueuePool,
+    pool_size=settings.db_pool_size,
+    max_overflow=settings.db_max_overflow,
+    pool_timeout=settings.db_pool_timeout,
+    pool_recycle=settings.db_pool_recycle,
+    pool_pre_ping=True,  # Verify connections before using
+    echo=settings.db_echo,
     future=True,
 )
 
