@@ -45,4 +45,28 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+.secrets/
 backend
+
+# generated artifacts
+.cypherx/
+tmp/
+*.log
+logs/
+scripts/uvicorn.log
+/uvicorn.log
+
+# workspace caches
+.artifacts/
+.claude/
+.storage/
+.next/
+.pytest_cache/
+
+# generated artifacts
+.cypherx/
+tmp/
+*.log
+logs/
+scripts/uvicorn.log
+/uvicorn.log

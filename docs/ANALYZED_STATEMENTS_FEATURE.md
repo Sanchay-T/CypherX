@@ -1041,7 +1041,7 @@ CLAUDE_VERTEX_PROJECT_ID=your-project-id
 **Issue: "No statements analyzed yet" even after upload**
 
 **Solution:**
-- Check if backend is running (`curl http://localhost:8000/health/live`)
+- Check if the FastAPI backend from `apps/` is running (`curl http://localhost:8000/health/live`)
 - Check if frontend API proxy is working (`curl http://localhost:3000/api/ai/statements`)
 - Check browser console for errors
 - Try hard refresh (Cmd+Shift+R)

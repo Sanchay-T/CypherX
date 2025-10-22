@@ -20,7 +20,7 @@ def main() -> None:
     parser.add_argument(
         "--output-dir",
         type=Path,
-        default=Path("tmp/binance_pnl_exports"),
+        default=Path("data/processed_exports/binance_pnl_exports"),
         help="Directory where the combined CSV will be written.",
     )
     args = parser.parse_args()

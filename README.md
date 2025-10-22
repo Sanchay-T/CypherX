@@ -1,36 +1,58 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CypherX
+
+End-to-end financial statement processing combining a FastAPI backend and a Next.js 14 frontend.
+
+## Project Layout
+
+```
+apps/          FastAPI code (APIs, domain, infra, legacy bridge)
+src/           Next.js app directory
+scripts/       Operational scripts
+public/        Frontend static assets & sample PDFs
+docs/          Architecture notes and runbooks
+tests/         Pytest suites (unit + API smoke checks)
+```
 
 ## Getting Started
 
-First, run the development server:
+1. **Install dependencies**
+   ```bash
+   python -m venv .venv
+   source .venv/bin/activate
+   pip install -r requirements.txt
+   npm install
+   ```
+2. **Configure environment**
+   ```bash
+   cp .env.example .env
+   # fill in Supabase, OpenAI, GOOGLE_APPLICATION_CREDENTIALS
+   ```
+   Place your Google service-account JSON at `.secrets/google-vertex.json` (ignored by git).
+3. **Run the stack**
+   ```bash
+   scripts/start_stack.sh
+   ```
+   This launches `uvicorn apps.main:app` on `:8000` and `next dev` on `:3000`.
+4. **Run smoke tests**
+   ```bash
+   source .venv/bin/activate
+   set -a; source .env; set +a
+   pytest tests/apps tests/api/test_statements_endpoints.py
+   ```
+   The API tests exercise the Mistral OCR endpoint, the full statement pipeline, and the legacy-only extraction using the real sample `public/samples/axis.pdf`.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Key Endpoints
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- `POST /ai/mistral/ocr` – Vertex AI Mistral OCR (PDF → markdown, cost/usage metrics)
+- `POST /ai/statements/normalize` – Full async pipeline (OCR → ledger → AI report)
+- `POST /ai/statements/legacy-normalize` – Legacy extraction only, returns Excel immediately
+- `GET /ai/statements/{job_id}` – Poll job status & artifacts
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Legacy helper scripts live under `scripts/` and the original analyzer remains in `old_endpoints/`.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Housekeeping
 
-## Learn More
+- Ephemeral outputs live in `.cypherx/legacy_exports/`
+- `.next/`, `.pytest_cache/`, `.artifacts/`, `.claude/` are ignored via `.gitignore`
+- Run `pytest` before pushing to ensure end-to-end parity
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

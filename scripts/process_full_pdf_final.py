@@ -69,13 +69,13 @@ def parse_table_from_markdown(markdown: str, page_num: int) -> pd.DataFrame:
 
 
 async def process_full_pdf():
-    pdf_path = "/Users/sanchay/Documents/projects/cyphersol/CypherX/OpTransactionHistoryUX501-09-2025 (2) (2).pdf"
+    pdf_path = Path("data/raw_statements/OpTransactionHistoryUX501-09-2025 (2) (2).pdf")
 
     print("=" * 80)
     print("PROCESSING FULL 118-PAGE BANK STATEMENT")
     print("=" * 80)
 
-    reader = PdfReader(pdf_path)
+    reader = PdfReader(str(pdf_path))
     total_pages = len(reader.pages)
     print(f"\nTotal pages: {total_pages}")
 
@@ -92,7 +92,7 @@ async def process_full_pdf():
         print(f"\n🔄 Processing pages {start_page + 1}-{end_page}...")
 
         # Extract chunk
-        chunk_bytes = extract_pages(pdf_path, start_page, end_page)
+        chunk_bytes = extract_pages(str(pdf_path), start_page, end_page)
         print(f"   Chunk size: {len(chunk_bytes) / 1024 / 1024:.2f} MB")
 
         # Run OCR
@@ -134,9 +134,10 @@ async def process_full_pdf():
         print(f"   ✅ All 7 required columns present!")
 
     # Save CSV
-    output_file = "tmp/full_statement_complete.csv"
-    combined_df.to_csv(output_file, index=False)
-    print(f"\n💾 Saved to {output_file}")
+    output_path = Path("data/processed_exports/full_statement_complete.csv")
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    combined_df.to_csv(output_path, index=False)
+    print(f"\n💾 Saved to {output_path}")
 
     # Show sample
     print(f"\nFirst 5 transactions:")

@@ -10,8 +10,8 @@ computes missing running balances, and writes a CSV with the required columns:
 
 Usage:
     python scripts/parse_mistral_statement.py \
-        --input tmp/ocr_first_two_pages.json \
-        --output tmp/transactions_first_two_pages.csv
+        --input data/ocr_exports/ocr_first_two_pages.json \
+        --output data/processed_exports/transactions_first_two_pages.csv
 """
 
 from __future__ import annotations

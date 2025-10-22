@@ -20,7 +20,7 @@ def main() -> None:
     parser.add_argument(
         "--output-dir",
         type=Path,
-        default=Path("tmp/capital_gain_exports"),
+        default=Path("data/processed_exports/capital_gain_exports"),
         help="Directory where CSV outputs will be written.",
     )
     args = parser.parse_args()

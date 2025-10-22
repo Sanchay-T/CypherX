@@ -1,10 +1,17 @@
 """Endpoints for statement processing pipeline."""
 
+import json
+import shutil
+import tempfile
+import uuid
+from pathlib import Path
+
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from fastapi.responses import FileResponse
 
 from apps.api.dependencies.statements import get_statement_pipeline
 from apps.domain.services.statements import StatementPipelineService
+from apps.legacy_bridge.adapter import run_legacy
 
 router = APIRouter(prefix="/ai/statements", tags=["ai"])
 
@@ -84,3 +91,64 @@ async def get_excel_data(job_id: str, token: str, pipeline: StatementPipelineSer
         raise HTTPException(status_code=403, detail="Invalid download token") from exc
     except FileNotFoundError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@router.post("/legacy-normalize")
+async def legacy_normalize_statement(
+    file: UploadFile = File(...),
+    bank_name: str | None = Form(default=None),
+    start_date: str | None = Form(default=None),
+    end_date: str | None = Form(default=None),
+):
+    """Run only the legacy extraction pipeline and return the generated Excel."""
+    if file.content_type not in {"application/pdf", "application/octet-stream"}:
+        raise HTTPException(status_code=415, detail="Only PDF uploads are supported")
+
+    payload = await file.read()
+    if not payload:
+        raise HTTPException(status_code=400, detail="Empty file upload")
+
+    try:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp_dir = Path(tmpdir)
+            filename = file.filename or "statement.pdf"
+            pdf_path = tmp_dir / filename
+            pdf_path.write_bytes(payload)
+
+            excel_path, summary = run_legacy(
+                [str(pdf_path)],
+                ocr=False,
+                bank_names=[bank_name] if bank_name else None,
+                start_dates=[start_date] if start_date else None,
+                end_dates=[end_date] if end_date else None,
+            )
+
+            exports_dir = Path(".cypherx/legacy_exports")
+            exports_dir.mkdir(parents=True, exist_ok=True)
+
+            export_name = f"{pdf_path.stem}_{uuid.uuid4().hex[:8]}.xlsx"
+            final_excel_path = exports_dir / export_name
+            shutil.copy(excel_path, final_excel_path)
+
+            summary_path = final_excel_path.with_suffix(".json")
+            summary_path.write_text(json.dumps(summary, indent=2))
+
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except Exception as exc:  # pragma: no cover - guard legacy adapter failures
+        raise HTTPException(status_code=502, detail=f"Legacy extraction failed: {exc}") from exc
+
+    response = FileResponse(
+        final_excel_path,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        filename=final_excel_path.name,
+    )
+    response.headers["X-Legacy-Export-Path"] = str(final_excel_path)
+    response.headers["X-Legacy-Summary-Path"] = str(summary_path)
+    if bank_name:
+        response.headers["X-Legacy-Bank-Name"] = bank_name
+    if start_date:
+        response.headers["X-Legacy-Start-Date"] = start_date
+    if end_date:
+        response.headers["X-Legacy-End-Date"] = end_date
+    return response

@@ -1,5 +1,7 @@
 """FastAPI application entrypoint."""
 
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -9,8 +11,19 @@ from apps.domain.models.base import Base
 from apps.infra.db.session import async_engine
 
 
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    async with async_engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    yield
+
+
 def create_app() -> FastAPI:
-    app = FastAPI(title=settings.api_title, version=settings.api_version)
+    app = FastAPI(
+        title=settings.api_title,
+        version=settings.api_version,
+        lifespan=lifespan,
+    )
 
     app.add_middleware(
         CORSMiddleware,
@@ -21,11 +34,6 @@ def create_app() -> FastAPI:
     )
 
     app.include_router(api_router)
-
-    @app.on_event("startup")
-    async def _create_schema() -> None:  # pragma: no cover - simple bootstrap
-        async with async_engine.begin() as conn:
-            await conn.run_sync(Base.metadata.create_all)
 
     @app.get("/health/live")
     async def live() -> dict[str, str]:  # pragma: no cover - simple health endpoint

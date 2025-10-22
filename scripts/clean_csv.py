@@ -2,11 +2,16 @@
 """
 Clean the CSV by removing header/metadata rows
 """
+from pathlib import Path
+
 import pandas as pd
 import re
 
+SOURCE_PATH = Path("data/processed_exports/full_statement_complete.csv")
+OUTPUT_PATH = Path("data/processed_exports/full_statement_complete_CLEAN.csv")
+
 # Read the messy CSV
-df = pd.read_csv("tmp/full_statement_complete.csv")
+df = pd.read_csv(SOURCE_PATH)
 
 print(f"Original rows: {len(df)}")
 
@@ -25,8 +30,9 @@ print(f"Cleaned rows: {len(df_clean)}")
 print(f"Removed {len(df) - len(df_clean)} junk rows")
 
 # Save cleaned CSV
-df_clean.to_csv("tmp/full_statement_complete_CLEAN.csv", index=False)
-print(f"\n✅ Saved cleaned CSV to: tmp/full_statement_complete_CLEAN.csv")
+OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
+df_clean.to_csv(OUTPUT_PATH, index=False)
+print(f"\n✅ Saved cleaned CSV to: {OUTPUT_PATH}")
 
 # Show first 10 rows
 print(f"\nFirst 10 transactions:")

@@ -29,10 +29,10 @@ def extract_pages(pdf_path: str, start: int, end: int) -> bytes:
 
 
 async def process_first_page():
-    pdf_path = "/Users/sanchay/Documents/projects/cyphersol/CypherX/OpTransactionHistoryUX501-09-2025 (2) (2).pdf"
+    pdf_path = Path("data/raw_statements/OpTransactionHistoryUX501-09-2025 (2) (2).pdf")
 
     print("Extracting first 2 pages (to get full table structure)...")
-    pages_bytes = extract_pages(pdf_path, 0, 2)
+    pages_bytes = extract_pages(str(pdf_path), 0, 2)
 
     print("Running Mistral OCR...")
     model_path = resolve_model_path()
@@ -88,8 +88,10 @@ async def process_first_page():
     print(df.head(5).to_string())
 
     # Save CSV
-    df.to_csv("tmp/first_page_final.csv", index=False)
-    print(f"\n💾 Saved to tmp/first_page_final.csv")
+    export_path = Path("data/processed_exports/first_page_final.csv")
+    export_path.parent.mkdir(parents=True, exist_ok=True)
+    df.to_csv(export_path, index=False)
+    print(f"\n💾 Saved to {export_path}")
 
     # Verify all columns present
     expected_cols = ["Transaction Date", "Value Date", "Narration", "Chq/Ref Number", "Withdrawal", "Deposit", "Balance"]

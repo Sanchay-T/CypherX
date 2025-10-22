@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import date
 from typing import Any, List, Literal, Optional
 
-from pydantic import BaseModel, Field, model_validator, validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 
 class ExtractionBase(BaseModel):
@@ -45,10 +45,9 @@ class InvoiceLineItem(BaseModel):
                 data.setdefault("item_description", description)
         return data
 
-    @validator("line_total", always=True)
-    def _infer_line_total(
-        cls, value: float | None, values: dict[str, Any]
-    ) -> float | None:
+    @field_validator("line_total", mode="before")
+    @classmethod
+    def _infer_line_total(cls, value: float | None, values: dict[str, Any]) -> float | None:
         qty = values.get("quantity")
         unit_price = values.get("unit_price")
         if value is None and qty is not None and unit_price is not None:
@@ -63,7 +62,8 @@ class PartyDetails(BaseModel):
     pan: str | None = None
     contact: str | dict[str, Any] | list[Any] | None = None
 
-    @validator("contact", pre=True)
+    @field_validator("contact", mode="before")
+    @classmethod
     def _normalise_contact(cls, value: Any) -> Any:
         if isinstance(value, dict):
             parts = [
@@ -97,10 +97,9 @@ class InvoiceExtraction(ExtractionBase):
     bank_details: dict[str, Any] = Field(default_factory=dict)
     currency: str | None = None
 
-    @validator("total_tax", always=True)
-    def _calculate_total_tax(
-        cls, value: float | None, values: dict[str, Any]
-    ) -> float | None:
+    @field_validator("total_tax", mode="before")
+    @classmethod
+    def _calculate_total_tax(cls, value: float | None, values: dict[str, Any]) -> float | None:
         if value is not None:
             return value
         taxes = [

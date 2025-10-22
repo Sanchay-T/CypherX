@@ -9,7 +9,15 @@ if str(ROOT) not in sys.path:
 
 from apps.domain.services.binance_pnl_parser import parse_binance_pnl_statement
 
-PDF_PATH = Path("Statements/Share_statements/Unstructured/binancepnl__unstructure_share_statement.pdf")
+PDF_PATH = (
+    ROOT
+    / "data"
+    / "raw_statements"
+    / "Statements"
+    / "Share_statements"
+    / "Unstructured"
+    / "binancepnl__unstructure_share_statement.pdf"
+)
 
 
 def test_binance_pnl_parser_extracts_table_and_header():

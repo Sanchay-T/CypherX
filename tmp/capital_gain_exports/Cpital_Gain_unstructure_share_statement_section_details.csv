@@ -1,2 +1,0 @@
-subscription_trxn_type,subscription_date,subscription_current_units,subscription_scheme_units,subscription_purchase_price,subscription_purchase_amount,grandfathered_nav_as_on_2018,grandfathered_cost_value,redemption_trxn_type,redemption_date,redemption_units,redemption_amount,redemption_price,tax_percentage,total_tax,short_term_gain,indexed_cost,long_term_gain_with_index,long_term_gain_without_index
-Purchase,08-12-2015,771.454,771.454,18.6038,14351.98,18.6038,14351.98,Redemption,26-08-2024,771.454,25046.03,32.466,0.0,0.0,0.0,0.0,0.0,10694.05

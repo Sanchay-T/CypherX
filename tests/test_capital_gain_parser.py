@@ -9,7 +9,15 @@ if str(ROOT) not in sys.path:
 
 from apps.domain.services.capital_gain_parser import parse_capital_gain_statement
 
-PDF_PATH = Path("Statements/Share_statements/Unstructured/Cpital Gain_unstructure_share_statement.pdf")
+PDF_PATH = (
+    ROOT
+    / "data"
+    / "raw_statements"
+    / "Statements"
+    / "Share_statements"
+    / "Unstructured"
+    / "Cpital Gain_unstructure_share_statement.pdf"
+)
 
 
 def test_capital_gain_parser_extracts_expected_tables():
